@@ -95,6 +95,10 @@ export const routePolicies: RoutePolicy[] = [
   { prefix: "/api/v1/project-management/ready", public: true },
   { prefix: "/api/v1/project-management/healthz", public: true },
   { prefix: "/api/v1/project-management/api/v1", authenticated: true },
+  { prefix: "/api/v1/procurement/health", public: true },
+  { prefix: "/api/v1/procurement/ready", public: true },
+  { prefix: "/api/v1/procurement/healthz", public: true },
+  { prefix: "/api/v1/procurement/api/v1", authenticated: true },
 ];
 
 export function matchPolicy(path: string, method: string): RoutePolicy | undefined {

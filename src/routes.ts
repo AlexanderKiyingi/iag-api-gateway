@@ -53,6 +53,11 @@ export const upstreamRoutes: Record<string, UpstreamRoute> = {
     prefix: "/api/v1/project-management",
     rewritePrefix: "/",
   },
+  "/api/v1/procurement": {
+    upstream: upstream("UPSTREAM_PROCUREMENT", "http://127.0.0.1:4009"),
+    prefix: "/api/v1/procurement",
+    rewritePrefix: "/",
+  },
 };
 
 /** True when the path is proxied to a platform service (must have an explicit route policy). */
