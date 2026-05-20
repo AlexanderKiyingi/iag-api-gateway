@@ -1,0 +1,49 @@
+# Standalone stack: nginx (edge) + api-gateway.
+# Upstreams default to host machine — override UPSTREAM_* for full platform testing.
+
+name: iag-api-gateway
+
+services:
+  api-gateway:
+    build:
+      context: ..
+      dockerfile: Dockerfile
+    environment:
+      NODE_ENV: production
+      PORT: "8080"
+      TRUST_PROXY: "true"
+      LOG_LEVEL: info
+      JWT_ISSUER: ${JWT_ISSUER:-http://localhost:3001}
+      JWKS_URL: ${JWKS_URL:-http://host.docker.internal:3001/.well-known/jwks.json}
+      GATEWAY_INTERNAL_SECRET: ${GATEWAY_INTERNAL_SECRET:-dev-gateway-secret-min-16-chars}
+      READY_PROBE_UPSTREAMS: ${READY_PROBE_UPSTREAMS:-false}
+      UPSTREAM_AUTHENTICATION: ${UPSTREAM_AUTHENTICATION:-http://host.docker.internal:3001}
+      UPSTREAM_NOTIFICATIONS: ${UPSTREAM_NOTIFICATIONS:-http://host.docker.internal:3002}
+      UPSTREAM_REPORTS: ${UPSTREAM_REPORTS:-http://host.docker.internal:3003}
+      UPSTREAM_ACCOUNTS: ${UPSTREAM_ACCOUNTS:-http://host.docker.internal:3005}
+      UPSTREAM_SUPPLY_CHAIN: ${UPSTREAM_SUPPLY_CHAIN:-http://host.docker.internal:4007}
+      UPSTREAM_FLEET: ${UPSTREAM_FLEET:-http://host.docker.internal:4008}
+      UPSTREAM_PROJECT_MANAGEMENT: ${UPSTREAM_PROJECT_MANAGEMENT:-http://host.docker.internal:4102}
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
+    expose:
+      - "8080"
+    healthcheck:
+      test: ["CMD", "sh", "-c", "wget -q -O /dev/null http://127.0.0.1:$$PORT/ready || exit 1"]
+      interval: 15s
+      timeout: 5s
+      retries: 5
+      start_period: 20s
+    restart: unless-stopped
+
+  nginx:
+    image: nginx:1.27-alpine
+    depends_on:
+      api-gateway:
+        condition: service_healthy
+    ports:
+      - "8080:80"
+    volumes:
+      - ./nginx/nginx.conf:/etc/nginx/nginx.conf:ro
+      - ./nginx/proxy_params.conf:/etc/nginx/proxy_params.conf:ro
+    restart: unless-stopped

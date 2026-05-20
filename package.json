@@ -9,7 +9,7 @@
     "dev": "tsx watch src/main.ts",
     "start": "node dist/main.js",
     "typecheck": "pnpm -r run typecheck && tsc -p tsconfig.json --noEmit",
-    "test": "pnpm run build && node --test dist/policies.test.js",
+    "test": "pnpm run build && node --test dist/*.test.js",
     "clean": "pnpm -r run clean && rimraf dist"
   },
   "dependencies": {
@@ -17,6 +17,7 @@
     "@iag/config": "workspace:*",
     "@iag/service-core": "workspace:*",
     "@fastify/http-proxy": "^11.1.2",
+    "@fastify/rate-limit": "^10.2.2",
     "fastify": "^5.2.1",
     "zod": "^3.24.2"
   },

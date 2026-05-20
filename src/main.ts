@@ -1,18 +1,41 @@
+import rateLimit from "@fastify/rate-limit";
 import httpProxy from "@fastify/http-proxy";
 import { createService } from "@iag/service-core";
 import { loadGatewayEnv } from "./config.js";
 import { registerAuthMiddleware } from "./middleware/auth.js";
+import { registerRequestId } from "./middleware/request-id.js";
+import { registerStripTrustHeaders } from "./middleware/strip-headers.js";
+import { createReadyCheck } from "./ready.js";
 import { upstreamRoutes } from "./routes.js";
 
 const env = loadGatewayEnv();
+const SHUTDOWN_TIMEOUT_MS = 30_000;
 
 const service = await createService({
   serviceName: "api-gateway",
   port: env.PORT,
+  trustProxy: env.TRUST_PROXY,
+  readyCheck: createReadyCheck(env.READY_PROBE_UPSTREAMS),
   async registerRoutes(app, logger) {
+    registerStripTrustHeaders(app);
+    registerRequestId(app);
+
+    await app.register(rateLimit, {
+      global: true,
+      timeWindow: env.RATE_LIMIT_WINDOW_MS,
+      keyGenerator: (request) => request.ip,
+      max: (request, _key) =>
+        (request.url.split("?")[0] ?? "").includes(
+          "/api/v1/authentication/oauth/token",
+        )
+          ? env.OAUTH_RATE_LIMIT_MAX
+          : env.RATE_LIMIT_MAX,
+    });
+
     registerAuthMiddleware(app, {
       jwksUrl: env.JWKS_URL,
       issuer: env.JWT_ISSUER,
+      audience: env.JWT_AUDIENCE,
       gatewayInternalSecret: env.GATEWAY_INTERNAL_SECRET,
     });
 
@@ -33,3 +56,17 @@ const service = await createService({
 });
 
 await service.start();
+
+async function shutdown(signal: string) {
+  service.logger.info({ signal }, "shutting down");
+  try {
+    await service.stop(SHUTDOWN_TIMEOUT_MS);
+    process.exit(0);
+  } catch (err) {
+    service.logger.error({ err }, "shutdown failed");
+    process.exit(1);
+  }
+}
+
+process.on("SIGINT", () => void shutdown("SIGINT"));
+process.on("SIGTERM", () => void shutdown("SIGTERM"));

@@ -6,6 +6,7 @@ import { isProxiedPath } from "../routes.js";
 export interface GatewayAuthConfig {
   jwksUrl: string;
   issuer: string;
+  audience?: string | string[];
   gatewayInternalSecret?: string;
 }
 
@@ -27,6 +28,7 @@ export function registerAuthMiddleware(
   const auth = createAuthClient({
     jwksUrl: config.jwksUrl,
     issuer: config.issuer,
+    audience: config.audience,
   });
 
   app.addHook("onRequest", async (request: FastifyRequest, reply: FastifyReply) => {
@@ -61,7 +63,12 @@ export function registerAuthMiddleware(
     }
 
     request.auth = principal;
-    forwardPrincipalHeaders(request, principal, config.gatewayInternalSecret);
+    forwardPrincipalHeaders(
+      request,
+      principal,
+      config.gatewayInternalSecret,
+      request.requestId,
+    );
 
     if (
       policy.authenticated &&
@@ -93,7 +100,12 @@ function forwardPrincipalHeaders(
   request: FastifyRequest,
   principal: NonNullable<FastifyRequest["auth"]>,
   gatewaySecret?: string,
+  requestId?: string,
 ) {
+  if (requestId) {
+    request.headers["x-request-id"] = requestId;
+    request.headers["x-correlation-id"] = requestId;
+  }
   request.headers[principalHeaders.userId] = principal.sub;
   if (principal.email) {
     request.headers[principalHeaders.email] = principal.email;
