@@ -21,6 +21,7 @@ COPY --from=build /app/node_modules ./node_modules
 COPY --from=build /app/packages ./packages
 
 EXPOSE 8080
+ENV PORT=8080
 HEALTHCHECK --interval=15s --timeout=5s --start-period=20s --retries=5 \
-  CMD wget -q -O /dev/null http://127.0.0.1:8080/ready || exit 1
+  CMD sh -c 'wget -q -O /dev/null "http://127.0.0.1:${PORT}/ready" || exit 1'
 CMD ["node", "dist/main.js"]
