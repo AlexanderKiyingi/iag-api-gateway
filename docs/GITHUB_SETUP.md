@@ -1,20 +1,19 @@
 # Publish `iag-api-gateway` to GitHub
 
-The repository is initialized locally at `../iag-api-gateway` with commit history. Create the remote and push:
+**Live repo:** https://github.com/AlexanderKiyingi/iag-api-gateway
 
-## 1. Create an empty repository on GitHub
+## First-time publish (new machine)
 
-- Name: `iag-api-gateway`
-- Do **not** add a README, `.gitignore`, or license (already present locally)
+```powershell
+gh auth login
+cd path/to/iag-api-gateway
+.\scripts\publish.ps1
+```
 
-Use your org (e.g. `AlexanderKiyingi` or `alvor-technologies`), consistent with other `iag-*` repos.
-
-## 2. Add remote and push
+Or manually:
 
 ```bash
-cd ../iag-api-gateway
-git remote add origin https://github.com/<org>/iag-api-gateway.git
-git push -u origin main
+gh repo create AlexanderKiyingi/iag-api-gateway --public --source . --remote origin --push
 ```
 
 ## 3. Meta-repo submodule (optional)
