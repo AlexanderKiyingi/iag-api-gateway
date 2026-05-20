@@ -14,7 +14,15 @@ const SAMPLE_PATHS: Record<string, string[]> = {
     "/api/v1/notifications/health",
   ],
   "/api/v1/reports": ["/api/v1/reports/health", "/api/v1/reports/v1/summary"],
-  "/api/v1/accounts": ["/api/v1/accounts/health", "/api/v1/accounts/v1/ledgers"],
+  "/api/v1/accounts": [
+    "/api/v1/accounts/health",
+    "/api/v1/accounts/v1/chart-of-accounts",
+  ],
+  "/api/v1/finance": [
+    "/api/v1/finance/health",
+    "/api/v1/finance/v1/chart-of-accounts",
+    "/api/v1/finance/v1/ledger/entries",
+  ],
   "/api/v1/supply-chain": [
     "/api/v1/supply-chain/public/q/x",
     "/api/v1/supply-chain/api/v1/farmers",

@@ -20,7 +20,8 @@ services:
       UPSTREAM_AUTHENTICATION: ${UPSTREAM_AUTHENTICATION:-http://host.docker.internal:3001}
       UPSTREAM_NOTIFICATIONS: ${UPSTREAM_NOTIFICATIONS:-http://host.docker.internal:3002}
       UPSTREAM_REPORTS: ${UPSTREAM_REPORTS:-http://host.docker.internal:3003}
-      UPSTREAM_ACCOUNTS: ${UPSTREAM_ACCOUNTS:-http://host.docker.internal:3005}
+      UPSTREAM_ACCOUNTS: ${UPSTREAM_ACCOUNTS:-http://host.docker.internal:3006}
+      UPSTREAM_FINANCE: ${UPSTREAM_FINANCE:-http://host.docker.internal:3006}
       UPSTREAM_SUPPLY_CHAIN: ${UPSTREAM_SUPPLY_CHAIN:-http://host.docker.internal:4007}
       UPSTREAM_FLEET: ${UPSTREAM_FLEET:-http://host.docker.internal:4008}
       UPSTREAM_PROJECT_MANAGEMENT: ${UPSTREAM_PROJECT_MANAGEMENT:-http://host.docker.internal:4102}

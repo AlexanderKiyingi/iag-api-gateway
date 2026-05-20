@@ -26,11 +26,19 @@ export const routePolicies: RoutePolicy[] = [
   {
     prefix: "/api/v1/accounts/v1",
     methods: ["POST", "PUT", "PATCH", "DELETE"],
-    permissions: ["accounts.change_ledger"],
+    permissions: [
+      "accounts.change_ledger",
+      "finance.change_ledger",
+      "finance.change_operations",
+    ],
   },
   {
     prefix: "/api/v1/accounts/v1",
-    permissions: ["accounts.view_ledger"],
+    permissions: [
+      "accounts.view_ledger",
+      "finance.view_ledger",
+      "finance.view_operations",
+    ],
   },
   {
     prefix: "/api/v1/notifications/v1/dispatch",
@@ -52,6 +60,18 @@ export const routePolicies: RoutePolicy[] = [
   { prefix: "/api/v1/reports/ready", public: true },
   { prefix: "/api/v1/accounts/health", public: true },
   { prefix: "/api/v1/accounts/ready", public: true },
+  { prefix: "/api/v1/finance/v1/admin", requireAdmin: true },
+  {
+    prefix: "/api/v1/finance/v1",
+    methods: ["POST", "PUT", "PATCH", "DELETE"],
+    permissions: ["finance.change_ledger", "finance.change_operations"],
+  },
+  {
+    prefix: "/api/v1/finance/v1",
+    permissions: ["finance.view_ledger", "finance.view_operations"],
+  },
+  { prefix: "/api/v1/finance/health", public: true },
+  { prefix: "/api/v1/finance/ready", public: true },
   {
     prefix: "/api/v1/reports",
     permissions: ["reports.view_report"],
