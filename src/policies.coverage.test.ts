@@ -27,10 +27,8 @@ const SAMPLE_PATHS: Record<string, string[]> = {
     "/api/v1/supply-chain/public/q/x",
     "/api/v1/supply-chain/api/v1/farmers",
   ],
-  "/api/v1/fleet": [
-    "/api/v1/fleet/api/iot/pings",
-    "/api/v1/fleet/api/vehicles",
-  ],
+  "/api/v1/fleet/api/iot/pings": ["/api/v1/fleet/api/iot/pings"],
+  "/api/v1/fleet": ["/api/v1/fleet/api/vehicles"],
   "/api/v1/project-management": [
     "/api/v1/project-management/api/v1/projects",
   ],

@@ -43,6 +43,12 @@ export const upstreamRoutes: Record<string, UpstreamRoute> = {
     prefix: "/api/v1/supply-chain",
     rewritePrefix: "/",
   },
+  /** Device HTTP ingest (Fleet_IoT) — must register before /api/v1/fleet. */
+  "/api/v1/fleet/api/iot/pings": {
+    upstream: upstream("UPSTREAM_FLEET_IOT_INGEST", "http://127.0.0.1:4080"),
+    prefix: "/api/v1/fleet/api/iot/pings",
+    rewritePrefix: "/api/iot/pings",
+  },
   "/api/v1/fleet": {
     upstream: upstream("UPSTREAM_FLEET", "http://127.0.0.1:4008"),
     prefix: "/api/v1/fleet",
