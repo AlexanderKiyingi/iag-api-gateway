@@ -64,6 +64,21 @@ export const upstreamRoutes: Record<string, UpstreamRoute> = {
     prefix: "/api/v1/procurement",
     rewritePrefix: "/",
   },
+  "/api/v1/contract-management": {
+    upstream: upstream("UPSTREAM_CONTRACT_MANAGEMENT", "http://127.0.0.1:4103"),
+    prefix: "/api/v1/contract-management",
+    rewritePrefix: "/",
+  },
+  "/api/v1/crm": {
+    upstream: upstream("UPSTREAM_CRM", "http://127.0.0.1:4101"),
+    prefix: "/api/v1/crm",
+    rewritePrefix: "/",
+  },
+  "/api/v1/dms": {
+    upstream: upstream("UPSTREAM_DMS", "http://127.0.0.1:4010"),
+    prefix: "/api/v1/dms",
+    rewritePrefix: "/",
+  },
 };
 
 /** True when the path is proxied to a platform service (must have an explicit route policy). */

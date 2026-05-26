@@ -32,6 +32,32 @@ const SAMPLE_PATHS: Record<string, string[]> = {
   "/api/v1/project-management": [
     "/api/v1/project-management/api/v1/projects",
   ],
+  "/api/v1/procurement": [
+    "/api/v1/procurement/health",
+    "/api/v1/procurement/api/v1/requisitions",
+  ],
+  "/api/v1/contract-management": [
+    "/api/v1/contract-management/v1/contracts",
+    "/api/v1/contract-management/v1/audit",
+    "/api/v1/contract-management/v1/health",
+  ],
+  "/api/v1/crm": [
+    "/api/v1/crm/v1/accounts",
+    "/api/v1/crm/v1/audit",
+    "/api/v1/crm/v1/admin/monitoring/summary",
+    "/api/v1/crm/health",
+  ],
+  "/api/v1/dms": [
+    "/api/v1/dms/v1/overview",
+    "/api/v1/dms/v1/outlets",
+    "/api/v1/dms/v1/field/check-ins",
+    "/api/v1/dms/v1/reports/run",
+    "/api/v1/dms/v1/exports/outlets",
+    "/api/v1/dms/v1/insights/signals",
+    "/api/v1/dms/v1/admin/monitoring/summary",
+    "/api/v1/dms/v1/audit",
+    "/api/v1/dms/health",
+  ],
 };
 
 describe("policy coverage", () => {

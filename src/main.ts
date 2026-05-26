@@ -2,6 +2,7 @@ import rateLimit from "@fastify/rate-limit";
 import httpProxy from "@fastify/http-proxy";
 import { createService } from "@iag/service-core";
 import { loadGatewayEnv } from "./config.js";
+import { initOTel, shutdownOTel } from "./otel.js";
 import { registerAuthMiddleware } from "./middleware/auth.js";
 import { registerRequestId } from "./middleware/request-id.js";
 import { registerStripTrustHeaders } from "./middleware/strip-headers.js";
@@ -10,6 +11,14 @@ import { upstreamRoutes } from "./routes.js";
 
 const env = loadGatewayEnv();
 const SHUTDOWN_TIMEOUT_MS = 30_000;
+
+// Initialise OTel BEFORE any HTTP client/server is constructed, so the
+// auto-instrumentation hooks pick up fetch and http.
+await initOTel({
+  serviceName: env.SERVICE_NAME,
+  endpoint: env.OTEL_EXPORTER_OTLP_ENDPOINT,
+  environment: env.NODE_ENV,
+});
 
 const service = await createService({
   serviceName: "api-gateway",
@@ -36,7 +45,6 @@ const service = await createService({
       jwksUrl: env.JWKS_URL,
       issuer: env.JWT_ISSUER,
       audience: env.JWT_AUDIENCE,
-      gatewayInternalSecret: env.GATEWAY_INTERNAL_SECRET,
     });
 
     for (const [prefix, config] of Object.entries(upstreamRoutes)) {
@@ -61,6 +69,7 @@ async function shutdown(signal: string) {
   service.logger.info({ signal }, "shutting down");
   try {
     await service.stop(SHUTDOWN_TIMEOUT_MS);
+    await shutdownOTel();
     process.exit(0);
   } catch (err) {
     service.logger.error({ err }, "shutdown failed");

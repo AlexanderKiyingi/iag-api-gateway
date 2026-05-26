@@ -99,6 +99,175 @@ export const routePolicies: RoutePolicy[] = [
   { prefix: "/api/v1/procurement/ready", public: true },
   { prefix: "/api/v1/procurement/healthz", public: true },
   { prefix: "/api/v1/procurement/api/v1", authenticated: true },
+  { prefix: "/api/v1/contract-management/v1/health", public: true },
+  {
+    prefix: "/api/v1/contract-management/v1/bootstrap",
+    methods: ["GET"],
+    authenticated: true,
+  },
+  {
+    prefix: "/api/v1/contract-management/v1/contracts",
+    methods: ["DELETE"],
+    permissions: ["contracts.delete"],
+  },
+  {
+    prefix: "/api/v1/contract-management/v1/contracts",
+    methods: ["POST", "PUT", "PATCH"],
+    permissions: ["contracts.create", "contracts.update"],
+  },
+  {
+    prefix: "/api/v1/contract-management/v1/contracts",
+    methods: ["GET"],
+    permissions: ["contracts.read"],
+  },
+  {
+    prefix: "/api/v1/contract-management/v1/exports",
+    methods: ["GET"],
+    permissions: ["reports.read", "reports.create", "contracts.read"],
+  },
+  {
+    prefix: "/api/v1/contract-management/v1/audit",
+    methods: ["GET"],
+    permissions: ["audit.read"],
+  },
+  {
+    prefix: "/api/v1/contract-management/v1/audit",
+    methods: ["POST"],
+    permissions: ["audit.create"],
+  },
+  // Catch-all for the remaining workspace endpoints: authenticated callers
+  // hit the service; per-endpoint permission enforcement happens inside the
+  // service via the registered permission catalogue.
+  {
+    prefix: "/api/v1/contract-management/v1",
+    authenticated: true,
+  },
+  { prefix: "/api/v1/crm/health", public: true },
+  { prefix: "/api/v1/crm/ready", public: true },
+  { prefix: "/api/v1/crm/healthz", public: true },
+  {
+    prefix: "/api/v1/crm/v1/bootstrap",
+    methods: ["GET"],
+    authenticated: true,
+  },
+  {
+    prefix: "/api/v1/crm/v1/audit",
+    methods: ["GET"],
+    permissions: ["audit.read"],
+  },
+  {
+    prefix: "/api/v1/crm/v1/audit",
+    methods: ["POST"],
+    permissions: ["audit.create"],
+  },
+  {
+    prefix: "/api/v1/crm/v1/admin",
+    requireStaff: true,
+  },
+  {
+    prefix: "/api/v1/crm/v1/accounts",
+    methods: ["DELETE"],
+    permissions: ["accounts.delete"],
+  },
+  {
+    prefix: "/api/v1/crm/v1/accounts",
+    methods: ["POST", "PATCH"],
+    permissions: ["accounts.create", "accounts.update"],
+  },
+  {
+    prefix: "/api/v1/crm/v1/deals",
+    methods: ["POST", "PATCH"],
+    permissions: ["deals.create", "deals.update"],
+  },
+  {
+    prefix: "/api/v1/crm/v1/platform/status",
+    requireStaff: true,
+  },
+  {
+    prefix: "/api/v1/crm/v1",
+    authenticated: true,
+  },
+  { prefix: "/api/v1/dms/health", public: true },
+  { prefix: "/api/v1/dms/ready", public: true },
+  { prefix: "/api/v1/dms/healthz", public: true },
+  { prefix: "/api/v1/dms/assets", public: true },
+  { prefix: "/api/v1/dms/index.html", public: true },
+  {
+    prefix: "/api/v1/dms/v1/outlets",
+    methods: ["POST", "PATCH"],
+    permissions: ["dms.manage_outlets"],
+  },
+  {
+    prefix: "/api/v1/dms/v1/orders",
+    methods: ["POST", "PATCH"],
+    permissions: ["dms.manage_orders"],
+  },
+  {
+    prefix: "/api/v1/dms/v1/invoices",
+    methods: ["POST"],
+    permissions: ["dms.manage_invoices"],
+  },
+  {
+    prefix: "/api/v1/dms/v1/claims",
+    methods: ["POST"],
+    permissions: ["dms.manage_claims"],
+  },
+  {
+    prefix: "/api/v1/dms/v1/promotions",
+    methods: ["POST"],
+    permissions: ["dms.manage_promotions"],
+  },
+  {
+    prefix: "/api/v1/dms/v1/dispatch",
+    methods: ["POST"],
+    permissions: ["dms.manage_dispatch"],
+  },
+  {
+    prefix: "/api/v1/dms/v1/reports",
+    methods: ["POST"],
+    permissions: ["dms.run_reports"],
+  },
+  {
+    prefix: "/api/v1/dms/v1/exports",
+    methods: ["POST"],
+    permissions: ["dms.run_reports"],
+  },
+  {
+    prefix: "/api/v1/dms/v1/field/check-ins",
+    methods: ["PATCH"],
+    permissions: ["dms.field_checkin"],
+  },
+  {
+    prefix: "/api/v1/dms/v1/field",
+    methods: ["POST"],
+    permissions: ["dms.field_checkin"],
+  },
+  {
+    prefix: "/api/v1/dms/v1/audit",
+    methods: ["POST"],
+    permissions: ["dms.audit.create"],
+  },
+  {
+    prefix: "/api/v1/dms/v1/audit",
+    permissions: ["dms.audit.read"],
+  },
+  {
+    prefix: "/api/v1/dms/v1/insights",
+    permissions: ["dms.insights.read"],
+  },
+  {
+    prefix: "/api/v1/dms/v1/admin",
+    requireStaff: true,
+  },
+  {
+    prefix: "/api/v1/dms/v1/platform/status",
+    requireStaff: true,
+  },
+  {
+    prefix: "/api/v1/dms/v1",
+    authenticated: true,
+  },
+  { prefix: "/api/v1/dms", public: true },
 ];
 
 export function matchPolicy(path: string, method: string): RoutePolicy | undefined {

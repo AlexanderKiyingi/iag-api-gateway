@@ -10,10 +10,10 @@ const gatewayEnvSchema = baseEnvSchema
       .string()
       .url()
       .default("http://localhost:3001/.well-known/jwks.json"),
-    /** Optional; authentication does not set aud today — enable when tokens include audience. */
-    JWT_AUDIENCE: z.string().min(1).optional(),
-    /** Shared with upstream services (AUTH_MODE=gateway) to trust forwarded principal headers. */
-    GATEWAY_INTERNAL_SECRET: z.string().optional(),
+    /** REQUIRED post-cutover. Tokens must carry this audience in their aud
+     *  claim array (typically "iag.gateway"). Backends each verify their own
+     *  audience separately. */
+    JWT_AUDIENCE: z.string().min(1).default("iag.gateway"),
     /** Set true when behind nginx / a load balancer (X-Forwarded-*). */
     TRUST_PROXY: z
       .enum(["true", "false"])
@@ -27,18 +27,8 @@ const gatewayEnvSchema = baseEnvSchema
     RATE_LIMIT_MAX: z.coerce.number().int().positive().default(300),
     RATE_LIMIT_WINDOW_MS: z.coerce.number().int().positive().default(60_000),
     OAUTH_RATE_LIMIT_MAX: z.coerce.number().int().positive().default(30),
-  })
-  .superRefine((env, ctx) => {
-    if (env.NODE_ENV !== "production") return;
-    const secret = env.GATEWAY_INTERNAL_SECRET?.trim();
-    if (!secret || secret.length < 16) {
-      ctx.addIssue({
-        code: z.ZodIssueCode.custom,
-        path: ["GATEWAY_INTERNAL_SECRET"],
-        message:
-          "required in production (min 16 characters) — must match upstream AUTH_MODE=gateway services",
-      });
-    }
+    /** OTLP endpoint for traces. Empty disables OTel. */
+    OTEL_EXPORTER_OTLP_ENDPOINT: z.string().default("http://otel-collector:4318"),
   });
 
 export type GatewayEnv = z.infer<typeof gatewayEnvSchema>;
