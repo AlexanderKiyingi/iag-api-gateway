@@ -99,6 +99,8 @@ export const routePolicies: RoutePolicy[] = [
   { prefix: "/api/v1/procurement/ready", public: true },
   { prefix: "/api/v1/procurement/healthz", public: true },
   { prefix: "/api/v1/procurement/api/v1", authenticated: true },
+  { prefix: "/api/v1/contract-management/health", public: true },
+  { prefix: "/api/v1/contract-management/ready", public: true },
   { prefix: "/api/v1/contract-management/v1/health", public: true },
   {
     prefix: "/api/v1/contract-management/v1/bootstrap",

@@ -37,6 +37,7 @@ const SAMPLE_PATHS: Record<string, string[]> = {
     "/api/v1/procurement/api/v1/requisitions",
   ],
   "/api/v1/contract-management": [
+    "/api/v1/contract-management/ready",
     "/api/v1/contract-management/v1/contracts",
     "/api/v1/contract-management/v1/audit",
     "/api/v1/contract-management/v1/health",
