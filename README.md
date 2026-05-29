@@ -27,7 +27,7 @@ Client → nginx (edge: rate limit, TLS, strip X-IAG-*) → iag-api-gateway (JWT
 
 ```bash
 pnpm install
-cp config/.env.example .env
+cp .env.example .env
 pnpm dev    # http://localhost:8080
 ```
 
@@ -42,7 +42,7 @@ docker compose -f deploy/docker-compose.yml up -d --build
 
 ## Environment
 
-See [`config/.env.example`](config/.env.example).
+See [`.env.example`](.env.example) (canonical) and [`config/.env.production.example`](config/.env.production.example) (production template).
 
 | Variable | Purpose |
 |----------|---------|
