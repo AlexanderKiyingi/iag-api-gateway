@@ -5,6 +5,7 @@ import { loadGatewayEnv } from "./config.js";
 import { initOTel, shutdownOTel } from "./otel.js";
 import { registerAuthMiddleware } from "./middleware/auth.js";
 import { registerRequestId } from "./middleware/request-id.js";
+import { registerSecurityHeaders } from "./middleware/security-headers.js";
 import { registerStripTrustHeaders } from "./middleware/strip-headers.js";
 import { createReadyCheck } from "./ready.js";
 import { upstreamRoutes } from "./routes.js";
@@ -26,6 +27,7 @@ const service = await createService({
   trustProxy: env.TRUST_PROXY,
   readyCheck: createReadyCheck(env.READY_PROBE_UPSTREAMS),
   async registerRoutes(app, logger) {
+    registerSecurityHeaders(app);
     registerStripTrustHeaders(app);
     registerRequestId(app);
 
