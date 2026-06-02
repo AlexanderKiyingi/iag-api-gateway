@@ -7,7 +7,7 @@ import { isProxiedPath, upstreamRoutes } from "./routes.js";
 const SAMPLE_PATHS: Record<string, string[]> = {
   "/api/v1/authentication": [
     "/api/v1/authentication/oauth/token",
-    "/api/v1/authentication/v1/me",
+    "/api/v1/authentication/v1/users/me",
   ],
   "/api/v1/notifications": [
     "/api/v1/notifications/v1/dispatch",
@@ -101,5 +101,18 @@ describe("policy coverage", () => {
       "POST",
     );
     assert.equal(policy?.public, true);
+  });
+
+  it("operations services require permission codenames at gateway", () => {
+    const cases: Array<{ path: string; method: string }> = [
+      { path: "/api/v1/fleet/api/vehicles", method: "GET" },
+      { path: "/api/v1/procurement/api/v1/requisitions", method: "GET" },
+      { path: "/api/v1/supply-chain/api/v1/farmers", method: "GET" },
+      { path: "/api/v1/project-management/api/v1/projects", method: "GET" },
+    ];
+    for (const { path, method } of cases) {
+      const policy = matchPolicy(path, method);
+      assert.ok(policy?.permissions?.length, `${method} ${path} should require permissions`);
+    }
   });
 });

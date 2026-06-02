@@ -1,0 +1,134 @@
+/**
+ * Coarse permission sets for gateway edge checks on operations services.
+ * Services enforce finer-grained RBAC per route; these lists mirror the
+ * codenames registered with iag-authentication (OR semantics at gateway).
+ */
+
+const fleetEntities = [
+  "vehicle",
+  "driver",
+  "jmp",
+  "cargo",
+  "cargo_doc",
+  "maintenance_item",
+  "part",
+  "tyre",
+  "trip",
+  "safety_event",
+  "compliance_item",
+  "service_request",
+  "task_item",
+  "deployment_day",
+  "fuel_record",
+] as const;
+
+export const fleetViewPermissions = fleetEntities.map(
+  (e) => `fleet.view_${e}`,
+);
+
+export const fleetMutatePermissions = [
+  ...fleetEntities.flatMap((e) => [
+    `fleet.add_${e}`,
+    `fleet.change_${e}`,
+    `fleet.delete_${e}`,
+  ]),
+  "fleet.approve_mileage_jmp",
+  "fleet.complete_toolbox_jmp",
+  "fleet.cancel_jmp",
+  "fleet.advance_stage_cargo",
+  "fleet.offload_cargo",
+  "fleet.demobilise_cargo",
+  "fleet.assign_request",
+  "fleet.complete_task",
+  "fleet.seed_deployment",
+  "fleet.add_deployment_entry",
+  "fleet.simulate_vehicles",
+  "fleet.manage_iot_device",
+  "fleet.change_notification",
+  "fleet.add_pm_schedule",
+  "fleet.change_pm_schedule",
+  "fleet.delete_pm_schedule",
+  "fleet.change_vehicle_inspection",
+  "fleet.change_operator_ticker",
+  "fleet.export_data",
+  "fleet.import_data",
+  "fleet.reset_data",
+];
+
+export const procurementViewPermissions = [
+  "procurement.view_seed",
+  "procurement.view_inbox",
+];
+
+export const procurementMutatePermissions = [
+  "procurement.add_requisition",
+  "procurement.change_requisition",
+  "procurement.delete_requisition",
+  "procurement.add_purchase_order",
+  "procurement.change_purchase_order",
+  "procurement.delete_purchase_order",
+  "procurement.add_vendor",
+  "procurement.change_vendor",
+  "procurement.delete_vendor",
+  "procurement.add_item",
+  "procurement.change_item",
+  "procurement.delete_item",
+  "procurement.add_budget",
+  "procurement.change_budget",
+  "procurement.delete_budget",
+  "procurement.add_rfq",
+  "procurement.change_rfq",
+  "procurement.delete_rfq",
+  "procurement.add_grn",
+  "procurement.change_grn",
+  "procurement.delete_grn",
+  "procurement.add_invoice",
+  "procurement.change_invoice",
+  "procurement.delete_invoice",
+  "procurement.add_contract",
+  "procurement.change_contract",
+  "procurement.delete_contract",
+  "procurement.emit_notification",
+];
+
+export const scmViewPermissions = [
+  "traceability.view_farmer",
+  "traceability.view_batch",
+  "traceability.view_chain",
+  "scm.view_supplier",
+  "scm.view_own_supplier",
+  "scm.view_purchaseorder",
+  "scm.view_inventory",
+  "scm.view_salesorder",
+  "compliance.view_certification",
+  "finance.view_farmerpayment",
+  "admin.view_user",
+  "admin.view_group",
+  "admin.view_permission",
+  "admin.view_auditlog",
+];
+
+export const scmMutatePermissions = [
+  "traceability.add_farmer",
+  "traceability.change_farmer",
+  "traceability.change_batch",
+  "traceability.add_trace_event",
+  "traceability.publish_qr",
+  "scm.add_supplier",
+  "scm.change_supplier",
+  "scm.add_purchaseorder",
+  "scm.change_purchaseorder",
+  "scm.add_salesorder",
+  "scm.change_salesorder",
+  "scm.change_inventory",
+  "finance.change_farmerpayment",
+  "compliance.change_certification",
+  "admin.add_user",
+  "admin.change_user",
+  "admin.delete_user",
+  "admin.add_group",
+  "admin.change_group",
+  "admin.delete_group",
+  "system.change_settings",
+  "system.run_demo_seed",
+];

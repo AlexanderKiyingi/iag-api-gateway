@@ -1,5 +1,14 @@
 /** Gateway route authorization — Django-style permissions and staff flags. */
 
+import {
+  fleetMutatePermissions,
+  fleetViewPermissions,
+  procurementMutatePermissions,
+  procurementViewPermissions,
+  scmMutatePermissions,
+  scmViewPermissions,
+} from "./service-permissions.js";
+
 export interface RoutePolicy {
   prefix: string;
   methods?: string[];
@@ -23,32 +32,25 @@ export const routePolicies: RoutePolicy[] = [
   { prefix: "/api/v1/authentication/v1", authenticated: true },
   { prefix: "/api/v1/accounts/v1/admin", requireAdmin: true },
   { prefix: "/api/v1/notifications/v1/admin", requireAdmin: true },
+  /** @deprecated Legacy prefix — mirrors /api/v1/finance RBAC until clients migrate */
   {
     prefix: "/api/v1/accounts/v1",
     methods: ["POST", "PUT", "PATCH", "DELETE"],
-    permissions: [
-      "accounts.change_ledger",
-      "finance.change_ledger",
-      "finance.change_operations",
-    ],
+    permissions: ["finance.change_ledger", "finance.change_operations"],
   },
   {
     prefix: "/api/v1/accounts/v1",
-    permissions: [
-      "accounts.view_ledger",
-      "finance.view_ledger",
-      "finance.view_operations",
-    ],
+    permissions: ["finance.view_ledger", "finance.view_operations"],
   },
   {
     prefix: "/api/v1/notifications/v1/dispatch",
     methods: ["POST"],
-    permissions: ["platform.add_servicecall"],
+    permissions: ["notifications.dispatch", "platform.add_servicecall"],
   },
   {
     prefix: "/api/v1/notifications/v1/templates",
     requireStaff: true,
-    permissions: ["auth.change_group"],
+    permissions: ["notifications.manage_templates", "auth.change_group"],
   },
   { prefix: "/api/v1/notifications/health", public: true },
   { prefix: "/api/v1/notifications/ready", public: true },
@@ -81,7 +83,15 @@ export const routePolicies: RoutePolicy[] = [
   { prefix: "/api/v1/supply-chain/openapi.yaml", public: true },
   { prefix: "/api/v1/supply-chain/public", public: true },
   { prefix: "/api/v1/supply-chain/api/v1/admin", requireAdmin: true },
-  { prefix: "/api/v1/supply-chain/api/v1", authenticated: true },
+  {
+    prefix: "/api/v1/supply-chain/api/v1",
+    methods: ["POST", "PUT", "PATCH", "DELETE"],
+    permissions: scmMutatePermissions,
+  },
+  {
+    prefix: "/api/v1/supply-chain/api/v1",
+    permissions: scmViewPermissions,
+  },
   { prefix: "/api/v1/fleet/health", public: true },
   { prefix: "/api/v1/fleet/ready", public: true },
   { prefix: "/api/v1/fleet/healthz", public: true },
@@ -90,15 +100,54 @@ export const routePolicies: RoutePolicy[] = [
     methods: ["POST"],
     public: true,
   },
-  { prefix: "/api/v1/fleet/api", authenticated: true },
+  {
+    prefix: "/api/v1/fleet/api",
+    methods: ["POST", "PUT", "PATCH", "DELETE"],
+    permissions: fleetMutatePermissions,
+  },
+  {
+    prefix: "/api/v1/fleet/api",
+    permissions: fleetViewPermissions,
+  },
   { prefix: "/api/v1/project-management/health", public: true },
   { prefix: "/api/v1/project-management/ready", public: true },
   { prefix: "/api/v1/project-management/healthz", public: true },
-  { prefix: "/api/v1/project-management/api/v1", authenticated: true },
+  {
+    prefix: "/api/v1/project-management/api/v1/workspace/members",
+    methods: ["POST", "PATCH", "DELETE"],
+    permissions: ["pm.admin"],
+  },
+  {
+    prefix: "/api/v1/project-management/api/v1",
+    methods: ["POST", "PUT", "PATCH", "DELETE"],
+    permissions: ["pm.mutate_workspace"],
+  },
+  {
+    prefix: "/api/v1/project-management/api/v1",
+    permissions: ["pm.view_workspace", "pm.mutate_workspace"],
+  },
   { prefix: "/api/v1/procurement/health", public: true },
   { prefix: "/api/v1/procurement/ready", public: true },
   { prefix: "/api/v1/procurement/healthz", public: true },
-  { prefix: "/api/v1/procurement/api/v1", authenticated: true },
+  {
+    prefix: "/api/v1/procurement/api/v1/notifications/emit",
+    methods: ["POST"],
+    permissions: ["procurement.emit_notification"],
+  },
+  {
+    prefix: "/api/v1/procurement/api/v1/notifications",
+    permissions: ["procurement.view_inbox"],
+  },
+  { prefix: "/api/v1/procurement/api/v1/auth/me", authenticated: true },
+  {
+    prefix: "/api/v1/procurement/api/v1",
+    methods: ["POST", "PUT", "PATCH", "DELETE"],
+    permissions: procurementMutatePermissions,
+  },
+  {
+    prefix: "/api/v1/procurement/api/v1",
+    permissions: procurementViewPermissions,
+  },
   { prefix: "/api/v1/contract-management/health", public: true },
   { prefix: "/api/v1/contract-management/ready", public: true },
   { prefix: "/api/v1/contract-management/v1/health", public: true },

@@ -8,7 +8,7 @@ import { registerRequestId } from "./middleware/request-id.js";
 import { registerSecurityHeaders } from "./middleware/security-headers.js";
 import { registerStripTrustHeaders } from "./middleware/strip-headers.js";
 import { createReadyCheck } from "./ready.js";
-import { upstreamRoutes } from "./routes.js";
+import { sortedUpstreamRoutes, upstreamRoutes } from "./routes.js";
 
 const env = loadGatewayEnv();
 const SHUTDOWN_TIMEOUT_MS = 30_000;
@@ -49,13 +49,13 @@ const service = await createService({
       audience: env.JWT_AUDIENCE,
     });
 
-    for (const [prefix, config] of Object.entries(upstreamRoutes)) {
+    for (const config of sortedUpstreamRoutes()) {
       await app.register(httpProxy, {
         upstream: config.upstream,
         prefix: config.prefix,
         rewritePrefix: config.rewritePrefix,
       });
-      logger.info({ prefix, upstream: config.upstream }, "registered upstream");
+      logger.info({ prefix: config.prefix, upstream: config.upstream }, "registered upstream");
     }
 
     app.get("/api/v1", async () => ({

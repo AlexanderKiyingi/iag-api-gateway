@@ -32,7 +32,7 @@ export const upstreamRoutes: Record<string, UpstreamRoute> = {
     prefix: "/api/v1/users",
     rewritePrefix: "/",
   },
-  /** @deprecated Legacy prefix — proxies to iag-finance until clients migrate to /api/v1/finance */
+  /** @deprecated Legacy finance prefix — use /api/v1/finance. RBAC mirrors finance.*; user/org data is under /api/v1/users. */
   "/api/v1/accounts": {
     upstream: upstream("UPSTREAM_ACCOUNTS", "http://127.0.0.1:3006"),
     prefix: "/api/v1/accounts",
@@ -86,9 +86,45 @@ export const upstreamRoutes: Record<string, UpstreamRoute> = {
   },
 };
 
+/** Longest-prefix match for gateway paths (fleet IoT before fleet, etc.). */
+export function matchUpstreamRoute(gatewayPath: string): UpstreamRoute | undefined {
+  const sorted = sortedUpstreamRoutes();
+  return sorted.find(
+    (route) =>
+      gatewayPath === route.prefix ||
+      gatewayPath.startsWith(`${route.prefix}/`),
+  );
+}
+
+/** Path sent to the upstream after prefix rewrite (mirrors @fastify/http-proxy). */
+export function rewriteUpstreamPath(
+  gatewayPath: string,
+  route: UpstreamRoute,
+): string {
+  if (
+    gatewayPath !== route.prefix &&
+    !gatewayPath.startsWith(`${route.prefix}/`)
+  ) {
+    throw new Error(
+      `path ${gatewayPath} does not match upstream prefix ${route.prefix}`,
+    );
+  }
+  const suffix =
+    gatewayPath === route.prefix ? "" : gatewayPath.slice(route.prefix.length);
+  if (route.rewritePrefix === "/") {
+    return suffix || "/";
+  }
+  return `${route.rewritePrefix}${suffix}`;
+}
+
+/** Upstream routes sorted longest prefix first — use when registering proxies. */
+export function sortedUpstreamRoutes(): UpstreamRoute[] {
+  return Object.values(upstreamRoutes).sort(
+    (a, b) => b.prefix.length - a.prefix.length,
+  );
+}
+
 /** True when the path is proxied to a platform service (must have an explicit route policy). */
 export function isProxiedPath(path: string): boolean {
-  return Object.keys(upstreamRoutes).some(
-    (prefix) => path === prefix || path.startsWith(`${prefix}/`),
-  );
+  return matchUpstreamRoute(path) !== undefined;
 }

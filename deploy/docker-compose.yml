@@ -20,11 +20,17 @@ services:
       UPSTREAM_AUTHENTICATION: ${UPSTREAM_AUTHENTICATION:-http://host.docker.internal:3001}
       UPSTREAM_NOTIFICATIONS: ${UPSTREAM_NOTIFICATIONS:-http://host.docker.internal:3002}
       UPSTREAM_REPORTS: ${UPSTREAM_REPORTS:-http://host.docker.internal:3003}
+      UPSTREAM_USERS: ${UPSTREAM_USERS:-http://host.docker.internal:3005}
       UPSTREAM_ACCOUNTS: ${UPSTREAM_ACCOUNTS:-http://host.docker.internal:3006}
       UPSTREAM_FINANCE: ${UPSTREAM_FINANCE:-http://host.docker.internal:3006}
       UPSTREAM_SUPPLY_CHAIN: ${UPSTREAM_SUPPLY_CHAIN:-http://host.docker.internal:4007}
       UPSTREAM_FLEET: ${UPSTREAM_FLEET:-http://host.docker.internal:4008}
+      UPSTREAM_FLEET_IOT_INGEST: ${UPSTREAM_FLEET_IOT_INGEST:-http://host.docker.internal:4080}
       UPSTREAM_PROJECT_MANAGEMENT: ${UPSTREAM_PROJECT_MANAGEMENT:-http://host.docker.internal:4102}
+      UPSTREAM_PROCUREMENT: ${UPSTREAM_PROCUREMENT:-http://host.docker.internal:4009}
+      UPSTREAM_CONTRACT_MANAGEMENT: ${UPSTREAM_CONTRACT_MANAGEMENT:-http://host.docker.internal:4103}
+      UPSTREAM_CRM: ${UPSTREAM_CRM:-http://host.docker.internal:4101}
+      UPSTREAM_DMS: ${UPSTREAM_DMS:-http://host.docker.internal:4010}
     extra_hosts:
       - "host.docker.internal:host-gateway"
     expose:
