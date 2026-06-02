@@ -270,6 +270,31 @@ export const routePolicies: RoutePolicy[] = [
     authenticated: true,
   },
   { prefix: "/api/v1/dms", public: true },
+  { prefix: "/api/v1/users/health", public: true },
+  { prefix: "/api/v1/users/ready", public: true },
+  { prefix: "/api/v1/users/v1/admin", permissions: ["users.admin"] },
+  {
+    prefix: "/api/v1/users/v1/users",
+    methods: ["GET"],
+    permissions: ["users.read_profile", "users.admin"],
+  },
+  {
+    prefix: "/api/v1/users/v1/me/profile",
+    methods: ["PATCH"],
+    authenticated: true,
+  },
+  { prefix: "/api/v1/users/v1/me/profile", authenticated: true },
+  {
+    prefix: "/api/v1/users/v1/orgs",
+    methods: ["POST", "PATCH", "DELETE"],
+    authenticated: true,
+  },
+  {
+    prefix: "/api/v1/users/v1/orgs",
+    methods: ["GET"],
+    authenticated: true,
+  },
+  { prefix: "/api/v1/users/v1", authenticated: true },
 ];
 
 export function matchPolicy(path: string, method: string): RoutePolicy | undefined {

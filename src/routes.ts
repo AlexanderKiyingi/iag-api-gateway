@@ -27,6 +27,11 @@ export const upstreamRoutes: Record<string, UpstreamRoute> = {
     prefix: "/api/v1/reports",
     rewritePrefix: "/",
   },
+  "/api/v1/users": {
+    upstream: upstream("UPSTREAM_USERS", "http://127.0.0.1:3005"),
+    prefix: "/api/v1/users",
+    rewritePrefix: "/",
+  },
   /** @deprecated Legacy prefix — proxies to iag-finance until clients migrate to /api/v1/finance */
   "/api/v1/accounts": {
     upstream: upstream("UPSTREAM_ACCOUNTS", "http://127.0.0.1:3006"),

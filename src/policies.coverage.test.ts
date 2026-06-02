@@ -59,6 +59,12 @@ const SAMPLE_PATHS: Record<string, string[]> = {
     "/api/v1/dms/v1/audit",
     "/api/v1/dms/health",
   ],
+  "/api/v1/users": [
+    "/api/v1/users/health",
+    "/api/v1/users/v1/me/profile",
+    "/api/v1/users/v1/orgs",
+    "/api/v1/users/v1/admin/users",
+  ],
 };
 
 describe("policy coverage", () => {
