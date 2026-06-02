@@ -16,6 +16,7 @@
     "@iag/auth-client": "workspace:*",
     "@iag/config": "workspace:*",
     "@iag/service-core": "workspace:*",
+    "@fastify/cors": "^10.0.2",
     "@fastify/http-proxy": "^11.1.2",
     "@fastify/rate-limit": "^10.2.2",
     "@opentelemetry/auto-instrumentations-node": "^0.50.0",

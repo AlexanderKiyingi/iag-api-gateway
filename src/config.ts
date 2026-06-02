@@ -1,5 +1,6 @@
 import { z } from "zod";
-import { baseEnvSchema, loadEnv } from "@iag/config";
+import { baseEnvSchema } from "@iag/config";
+import { corsHasWildcard, parseCORSOrigins } from "./middleware/cors.js";
 
 const gatewayEnvSchema = baseEnvSchema
   .extend({
@@ -14,6 +15,11 @@ const gatewayEnvSchema = baseEnvSchema
      *  claim array (typically "iag.gateway"). Backends each verify their own
      *  audience separately. */
     JWT_AUDIENCE: z.string().min(1).default("iag.gateway"),
+    /** Comma-separated browser origins (canonical: CORS_ALLOWED_ORIGINS). */
+    CORS_ALLOWED_ORIGINS: z.array(z.string().min(1)).default([
+      "http://localhost:3000",
+      "http://localhost:5173",
+    ]),
     /** Set true when behind nginx / a load balancer (X-Forwarded-*). */
     TRUST_PROXY: z
       .enum(["true", "false"])
@@ -34,5 +40,20 @@ const gatewayEnvSchema = baseEnvSchema
 export type GatewayEnv = z.infer<typeof gatewayEnvSchema>;
 
 export function loadGatewayEnv(): GatewayEnv {
-  return loadEnv(gatewayEnvSchema);
+  const corsOrigins = parseCORSOrigins(process.env);
+  const parsed = gatewayEnvSchema.safeParse({
+    ...process.env,
+    CORS_ALLOWED_ORIGINS: corsOrigins,
+  });
+  if (!parsed.success) {
+    const message = parsed.error.issues
+      .map((issue) => `${issue.path.join(".")}: ${issue.message}`)
+      .join("\n");
+    throw new Error(`Invalid environment configuration:\n${message}`);
+  }
+  const env = parsed.data;
+  if (env.NODE_ENV === "production" && corsHasWildcard(env.CORS_ALLOWED_ORIGINS)) {
+    throw new Error("CORS allowlist must not include '*' when NODE_ENV=production");
+  }
+  return env;
 }

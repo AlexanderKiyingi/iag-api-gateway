@@ -8,6 +8,7 @@ const SAMPLE_PATHS: Record<string, string[]> = {
   "/api/v1/authentication": [
     "/api/v1/authentication/oauth/token",
     "/api/v1/authentication/v1/users/me",
+    "/api/v1/authentication/v1/admin/audit",
   ],
   "/api/v1/notifications": [
     "/api/v1/notifications/v1/dispatch",
@@ -28,18 +29,20 @@ const SAMPLE_PATHS: Record<string, string[]> = {
     "/api/v1/supply-chain/api/v1/farmers",
   ],
   "/api/v1/fleet/api/iot/pings": ["/api/v1/fleet/api/iot/pings"],
-  "/api/v1/fleet": ["/api/v1/fleet/api/vehicles"],
+  "/api/v1/fleet": ["/api/v1/fleet/api/vehicles", "/api/v1/fleet/api/admin/audit-logs"],
   "/api/v1/project-management": [
     "/api/v1/project-management/api/v1/projects",
   ],
   "/api/v1/procurement": [
     "/api/v1/procurement/health",
     "/api/v1/procurement/api/v1/requisitions",
+    "/api/v1/procurement/api/v1/admin/audit-logs",
   ],
   "/api/v1/contract-management": [
     "/api/v1/contract-management/ready",
     "/api/v1/contract-management/v1/contracts",
     "/api/v1/contract-management/v1/audit",
+    "/api/v1/contract-management/v1/admin/audit-logs",
     "/api/v1/contract-management/v1/health",
   ],
   "/api/v1/crm": [
@@ -64,6 +67,7 @@ const SAMPLE_PATHS: Record<string, string[]> = {
     "/api/v1/users/v1/me/profile",
     "/api/v1/users/v1/orgs",
     "/api/v1/users/v1/admin/users",
+    "/api/v1/users/v1/admin/audit-logs",
   ],
 };
 

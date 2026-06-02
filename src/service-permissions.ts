@@ -22,9 +22,11 @@ const fleetEntities = [
   "fuel_record",
 ] as const;
 
-export const fleetViewPermissions = fleetEntities.map(
-  (e) => `fleet.view_${e}`,
-);
+export const fleetViewPermissions = [
+  ...fleetEntities.map((e) => `fleet.view_${e}`),
+  "fleet.view_audit_entry",
+  "fleet.view_operator_ticker",
+];
 
 export const fleetMutatePermissions = [
   ...fleetEntities.flatMap((e) => [
@@ -58,6 +60,7 @@ export const fleetMutatePermissions = [
 export const procurementViewPermissions = [
   "procurement.view_seed",
   "procurement.view_inbox",
+  "audit.view_api_log",
 ];
 
 export const procurementMutatePermissions = [

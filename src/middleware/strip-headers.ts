@@ -26,8 +26,11 @@ export function registerStripTrustHeaders(app: FastifyInstance) {
       for (const name of FORBIDDEN_CLIENT_HEADERS) {
         if (request.headers[name] !== undefined) {
           return reply.status(400).send({
-            error: "bad_request",
-            reason: `header ${name} is not permitted; the gateway no longer trusts client-supplied principal headers`,
+            error: {
+              code: "BAD_REQUEST",
+              message: `Header ${name} is not permitted; the gateway no longer trusts client-supplied principal headers`,
+            },
+            reason: `header ${name} is not permitted`,
           });
         }
       }

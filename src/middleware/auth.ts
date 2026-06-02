@@ -12,6 +12,30 @@ export interface GatewayAuthConfig {
   audience: string | string[];
 }
 
+interface ErrorBody {
+  error: {
+    code: string;
+    message: string;
+  };
+  reason?: string;
+  required_permission?: string[];
+  require_staff?: boolean;
+  require_admin?: boolean;
+}
+
+function sendError(
+  reply: FastifyReply,
+  status: number,
+  code: string,
+  message: string,
+  extra?: Omit<ErrorBody, "error">,
+) {
+  return reply.status(status).send({
+    error: { code, message },
+    ...extra,
+  });
+}
+
 export function registerAuthMiddleware(
   app: FastifyInstance,
   config: GatewayAuthConfig,
@@ -30,10 +54,13 @@ export function registerAuthMiddleware(
 
       if (!policy) {
         if (isProxiedPath(path)) {
-          return reply.status(403).send({
-            error: "forbidden",
-            reason: "no_route_policy",
-          });
+          return sendError(
+            reply,
+            403,
+            "FORBIDDEN",
+            "No route policy matches this path",
+            { reason: "no_route_policy" },
+          );
         }
         return;
       }
@@ -44,7 +71,12 @@ export function registerAuthMiddleware(
 
       const header = request.headers.authorization;
       if (!header?.startsWith("Bearer ")) {
-        return reply.status(401).send({ error: "missing bearer token" });
+        return sendError(
+          reply,
+          401,
+          "UNAUTHORIZED",
+          "Missing bearer token",
+        );
       }
 
       const token = header.slice("Bearer ".length);
@@ -52,7 +84,12 @@ export function registerAuthMiddleware(
       try {
         principal = await auth.verifyAccessToken(token);
       } catch {
-        return reply.status(401).send({ error: "invalid token" });
+        return sendError(
+          reply,
+          401,
+          "UNAUTHORIZED",
+          "Invalid or expired token",
+        );
       }
 
       // Stash the verified principal for downstream observability hooks.
@@ -82,8 +119,15 @@ export function registerAuthMiddleware(
           requireAdmin: policy.requireAdmin,
         })
       ) {
-        return reply.status(403).send({
-          error: "forbidden",
+        let message = "Access denied for this route";
+        if (policy.requireAdmin) {
+          message = "Admin access required";
+        } else if (policy.requireStaff) {
+          message = "Staff access required";
+        } else if (policy.permissions?.length) {
+          message = `Missing required permission (need one of: ${policy.permissions.join(", ")})`;
+        }
+        return sendError(reply, 403, "FORBIDDEN", message, {
           required_permission: policy.permissions,
           require_staff: policy.requireStaff,
           require_admin: policy.requireAdmin,

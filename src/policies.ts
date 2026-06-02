@@ -106,6 +106,10 @@ export const routePolicies: RoutePolicy[] = [
     permissions: fleetMutatePermissions,
   },
   {
+    prefix: "/api/v1/fleet/api/admin/audit-logs",
+    permissions: ["fleet.view_audit_entry"],
+  },
+  {
     prefix: "/api/v1/fleet/api",
     permissions: fleetViewPermissions,
   },
@@ -139,6 +143,10 @@ export const routePolicies: RoutePolicy[] = [
     permissions: ["procurement.view_inbox"],
   },
   { prefix: "/api/v1/procurement/api/v1/auth/me", authenticated: true },
+  {
+    prefix: "/api/v1/procurement/api/v1/admin/audit-logs",
+    permissions: ["audit.view_api_log"],
+  },
   {
     prefix: "/api/v1/procurement/api/v1",
     methods: ["POST", "PUT", "PATCH", "DELETE"],
@@ -185,6 +193,10 @@ export const routePolicies: RoutePolicy[] = [
     prefix: "/api/v1/contract-management/v1/audit",
     methods: ["POST"],
     permissions: ["audit.create"],
+  },
+  {
+    prefix: "/api/v1/contract-management/v1/admin/audit-logs",
+    permissions: ["audit.read"],
   },
   // Catch-all for the remaining workspace endpoints: authenticated callers
   // hit the service; per-endpoint permission enforcement happens inside the
