@@ -2,6 +2,10 @@ import rateLimit from "@fastify/rate-limit";
 import httpProxy from "@fastify/http-proxy";
 import { createService } from "@iag/service-core";
 import { loadGatewayEnv } from "./config.js";
+import {
+  createProxyOnError,
+  registerGatewayErrorHandler,
+} from "./errors.js";
 import { initOTel, shutdownOTel } from "./otel.js";
 import { registerAuthMiddleware } from "./middleware/auth.js";
 import { registerCORS } from "./middleware/cors.js";
@@ -13,6 +17,7 @@ import { sortedUpstreamRoutes, upstreamRoutes } from "./routes.js";
 
 const env = loadGatewayEnv();
 const SHUTDOWN_TIMEOUT_MS = 30_000;
+const exposeErrorDetail = env.NODE_ENV !== "production";
 
 // Initialise OTel BEFORE any HTTP client/server is constructed, so the
 // auto-instrumentation hooks pick up fetch and http.
@@ -28,6 +33,7 @@ const service = await createService({
   trustProxy: env.TRUST_PROXY,
   readyCheck: createReadyCheck(env.READY_PROBE_UPSTREAMS),
   async registerRoutes(app, logger) {
+    registerGatewayErrorHandler(app, { exposeDetail: exposeErrorDetail });
     await registerCORS(app, env);
     registerSecurityHeaders(app);
     registerStripTrustHeaders(app);
@@ -56,6 +62,11 @@ const service = await createService({
         upstream: config.upstream,
         prefix: config.prefix,
         rewritePrefix: config.rewritePrefix,
+        replyOptions: {
+          onError: createProxyOnError(config.prefix, {
+            exposeDetail: exposeErrorDetail,
+          }),
+        },
       });
       logger.info({ prefix: config.prefix, upstream: config.upstream }, "registered upstream");
     }

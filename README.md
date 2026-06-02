@@ -52,6 +52,7 @@ See [`.env.example`](.env.example) (canonical) and [`config/.env.production.exam
 | `TRUST_PROXY` | `true` behind nginx / load balancer |
 | `READY_PROBE_UPSTREAMS` | `true` to probe each upstream `/ready` on gateway `/ready` |
 | `RATE_LIMIT_MAX` / `OAUTH_RATE_LIMIT_MAX` | Per-IP limits at the gateway |
+| `CORS_ALLOWED_ORIGINS` | Comma-separated browser origins (canonical; legacy aliases supported) |
 | `UPSTREAM_*` | Service base URLs |
 
 ## Scripts
@@ -72,7 +73,30 @@ See [`.env.example`](.env.example) (canonical) and [`config/.env.production.exam
 - **Rate limiting** — global + stricter OAuth token path
 - **Production config** — enforces `GATEWAY_INTERNAL_SECRET` when `NODE_ENV=production`
 - **Policy coverage tests** — CI fails if sample paths lack policies
+- **CORS** — `@fastify/cors` with `CORS_ALLOWED_ORIGINS` (see `src/middleware/cors.ts`)
+- **Structured errors** — JSON envelopes for auth failures, proxy upstream outages, and uncaught exceptions (see `src/errors.ts`)
 - **nginx** — `deploy/nginx/` for edge proxy (see `deploy/docker-compose.yml`)
+
+### Error responses
+
+All gateway-generated errors use a consistent envelope:
+
+```json
+{
+  "error": { "code": "BAD_GATEWAY", "message": "Authentication service is unavailable" },
+  "upstream": "/api/v1/authentication"
+}
+```
+
+| Code | When |
+|------|------|
+| `UNAUTHORIZED` | Missing/invalid Bearer token |
+| `FORBIDDEN` | Policy denied or no route policy |
+| `BAD_GATEWAY` | Upstream connection refused / unreachable |
+| `UPSTREAM_ERROR` | Upstream returned a proxy error |
+| `INTERNAL_ERROR` | Uncaught exception in auth middleware or gateway |
+
+In non-production, `detail` may include the underlying error message. OAuth/login via `/api/v1/authentication/oauth/token` returns `502` with the envelope above when authentication is down — not an empty `500`.
 
 ## Shared libraries
 
