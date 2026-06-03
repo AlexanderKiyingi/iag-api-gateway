@@ -171,7 +171,12 @@ export const routePolicies: RoutePolicy[] = [
   },
   {
     prefix: "/api/v1/contract-management/v1/contracts",
-    methods: ["POST", "PUT", "PATCH"],
+    methods: ["PATCH"],
+    authenticated: true,
+  },
+  {
+    prefix: "/api/v1/contract-management/v1/contracts",
+    methods: ["POST", "PUT"],
     permissions: ["contracts.create", "contracts.update"],
   },
   {
