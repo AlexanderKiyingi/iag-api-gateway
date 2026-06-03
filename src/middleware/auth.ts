@@ -66,8 +66,23 @@ async function enforceAuthPolicy(
     return;
   }
 
+  let token: string | undefined;
   const header = request.headers.authorization;
-  if (!header?.startsWith("Bearer ")) {
+  if (header?.startsWith("Bearer ")) {
+    token = header.slice("Bearer ".length);
+  } else if (
+    request.headers.upgrade?.toLowerCase() === "websocket" &&
+    path.includes("/api/v1/project-management/api/v1/ws/")
+  ) {
+    const q = request.url.includes("?") ? request.url.split("?")[1] : "";
+    const fromQuery = new URLSearchParams(q).get("token");
+    if (fromQuery) {
+      token = fromQuery;
+      request.headers.authorization = `Bearer ${fromQuery}`;
+    }
+  }
+
+  if (!token) {
     return sendGatewayError(
       reply,
       401,
@@ -75,8 +90,6 @@ async function enforceAuthPolicy(
       "Missing bearer token",
     );
   }
-
-  const token = header.slice("Bearer ".length);
   let principal;
   try {
     principal = await auth.verifyAccessToken(token);
