@@ -39,6 +39,7 @@ export const fleetMutatePermissions = [
   ]),
   "fleet.approve_mileage_jmp",
   "fleet.complete_toolbox_jmp",
+  "fleet.complete_jmp",
   "fleet.cancel_jmp",
   "fleet.advance_stage_cargo",
   "fleet.offload_cargo",
