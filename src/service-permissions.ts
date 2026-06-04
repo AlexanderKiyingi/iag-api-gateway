@@ -26,6 +26,9 @@ export const fleetViewPermissions = [
   ...fleetEntities.map((e) => `fleet.view_${e}`),
   "fleet.view_audit_entry",
   "fleet.view_operator_ticker",
+  "fleet.view_telemetry",
+  "fleet.view_notification",
+  "fleet.view_pm_schedule",
 ];
 
 export const fleetMutatePermissions = [
