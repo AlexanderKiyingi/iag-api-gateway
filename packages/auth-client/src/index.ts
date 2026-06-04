@@ -16,6 +16,7 @@ export {
   GROUP_STAFF,
   GROUP_SUPERADMIN,
   GROUP_USER,
+  groupsFromClaims,
   hasAllPermissions,
   hasAnyPermission,
   hasPermission,

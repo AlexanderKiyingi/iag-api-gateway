@@ -69,6 +69,16 @@ const SAMPLE_PATHS: Record<string, string[]> = {
     "/api/v1/users/v1/admin/users",
     "/api/v1/users/v1/admin/audit-logs",
   ],
+  "/api/v1/traceability": [
+    "/api/v1/traceability/health",
+    "/api/v1/traceability/api/v1/events",
+    "/api/v1/traceability/api/v1/lots",
+  ],
+  "/api/v1/mes": ["/api/v1/mes/health", "/api/v1/mes/api/v1/work-orders"],
+  "/api/v1/quality-control": [
+    "/api/v1/quality-control/health",
+    "/api/v1/quality-control/api/v1/inspections",
+  ],
 };
 
 describe("policy coverage", () => {
