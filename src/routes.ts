@@ -84,6 +84,21 @@ export const upstreamRoutes: Record<string, UpstreamRoute> = {
     prefix: "/api/v1/dms",
     rewritePrefix: "/",
   },
+  "/api/v1/traceability": {
+    upstream: upstream("UPSTREAM_TRACEABILITY", "http://127.0.0.1:4011"),
+    prefix: "/api/v1/traceability",
+    rewritePrefix: "/",
+  },
+  "/api/v1/mes": {
+    upstream: upstream("UPSTREAM_MES", "http://127.0.0.1:4003"),
+    prefix: "/api/v1/mes",
+    rewritePrefix: "/",
+  },
+  "/api/v1/quality-control": {
+    upstream: upstream("UPSTREAM_QUALITY_CONTROL", "http://127.0.0.1:4004"),
+    prefix: "/api/v1/quality-control",
+    rewritePrefix: "/",
+  },
 };
 
 /** Longest-prefix match for gateway paths (fleet IoT before fleet, etc.). */

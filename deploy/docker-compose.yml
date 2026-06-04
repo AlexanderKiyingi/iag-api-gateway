@@ -31,6 +31,9 @@ services:
       UPSTREAM_CONTRACT_MANAGEMENT: ${UPSTREAM_CONTRACT_MANAGEMENT:-http://host.docker.internal:4103}
       UPSTREAM_CRM: ${UPSTREAM_CRM:-http://host.docker.internal:4101}
       UPSTREAM_DMS: ${UPSTREAM_DMS:-http://host.docker.internal:4010}
+      UPSTREAM_TRACEABILITY: ${UPSTREAM_TRACEABILITY:-http://host.docker.internal:4011}
+      UPSTREAM_MES: ${UPSTREAM_MES:-http://host.docker.internal:4003}
+      UPSTREAM_QUALITY_CONTROL: ${UPSTREAM_QUALITY_CONTROL:-http://host.docker.internal:4004}
     extra_hosts:
       - "host.docker.internal:host-gateway"
     expose:

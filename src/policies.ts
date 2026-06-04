@@ -62,6 +62,10 @@ export const routePolicies: RoutePolicy[] = [
   { prefix: "/api/v1/reports/ready", public: true },
   { prefix: "/api/v1/accounts/health", public: true },
   { prefix: "/api/v1/accounts/ready", public: true },
+  {
+    prefix: "/api/v1/finance/v1/portal",
+    authenticated: true,
+  },
   { prefix: "/api/v1/finance/v1/admin", requireAdmin: true },
   {
     prefix: "/api/v1/finance/v1",
@@ -82,6 +86,10 @@ export const routePolicies: RoutePolicy[] = [
   { prefix: "/api/v1/supply-chain/ready", public: true },
   { prefix: "/api/v1/supply-chain/openapi.yaml", public: true },
   { prefix: "/api/v1/supply-chain/public", public: true },
+  {
+    prefix: "/api/v1/supply-chain/api/v1/portal",
+    authenticated: true,
+  },
   { prefix: "/api/v1/supply-chain/api/v1/admin", requireAdmin: true },
   {
     prefix: "/api/v1/supply-chain/api/v1",
@@ -133,6 +141,10 @@ export const routePolicies: RoutePolicy[] = [
   { prefix: "/api/v1/procurement/health", public: true },
   { prefix: "/api/v1/procurement/ready", public: true },
   { prefix: "/api/v1/procurement/healthz", public: true },
+  {
+    prefix: "/api/v1/procurement/api/v1/portal",
+    authenticated: true,
+  },
   {
     prefix: "/api/v1/procurement/api/v1/notifications/emit",
     methods: ["POST"],
@@ -336,6 +348,50 @@ export const routePolicies: RoutePolicy[] = [
     authenticated: true,
   },
   { prefix: "/api/v1/dms", public: true },
+  { prefix: "/api/v1/traceability/health", public: true },
+  { prefix: "/api/v1/traceability/ready", public: true },
+  { prefix: "/api/v1/traceability/healthz", public: true },
+  { prefix: "/api/v1/traceability/public", public: true },
+  {
+    prefix: "/api/v1/traceability/api/v1/lots",
+    methods: ["POST"],
+    permissions: ["traceability.publish_qr"],
+  },
+  {
+    prefix: "/api/v1/traceability/api/v1/events",
+    methods: ["POST"],
+    permissions: ["traceability.add_trace_event"],
+  },
+  {
+    prefix: "/api/v1/traceability/api/v1/events",
+    permissions: ["traceability.view_events"],
+  },
+  {
+    prefix: "/api/v1/traceability/api/v1",
+    permissions: ["traceability.view_chain", "traceability.view_events"],
+  },
+  { prefix: "/api/v1/mes/health", public: true },
+  { prefix: "/api/v1/mes/ready", public: true },
+  {
+    prefix: "/api/v1/mes/api/v1",
+    methods: ["POST", "PUT", "PATCH", "DELETE"],
+    authenticated: true,
+  },
+  {
+    prefix: "/api/v1/mes/api/v1",
+    authenticated: true,
+  },
+  { prefix: "/api/v1/quality-control/health", public: true },
+  { prefix: "/api/v1/quality-control/ready", public: true },
+  {
+    prefix: "/api/v1/quality-control/api/v1",
+    methods: ["POST", "PUT", "PATCH", "DELETE"],
+    authenticated: true,
+  },
+  {
+    prefix: "/api/v1/quality-control/api/v1",
+    authenticated: true,
+  },
   { prefix: "/api/v1/users/health", public: true },
   { prefix: "/api/v1/users/ready", public: true },
   { prefix: "/api/v1/users/v1/admin", permissions: ["users.admin"] },

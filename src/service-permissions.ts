@@ -60,6 +60,8 @@ export const fleetMutatePermissions = [
 export const procurementViewPermissions = [
   "procurement.view_seed",
   "procurement.view_inbox",
+  "procurement.view_own_po",
+  "procurement.view_own_invoice",
   "audit.view_api_log",
 ];
 
@@ -98,13 +100,17 @@ export const scmViewPermissions = [
   "traceability.view_farmer",
   "traceability.view_batch",
   "traceability.view_chain",
+  "traceability.view_events",
   "scm.view_supplier",
   "scm.view_own_supplier",
+  "scm.view_own_batch",
+  "scm.view_own_farm",
   "scm.view_purchaseorder",
   "scm.view_inventory",
   "scm.view_salesorder",
   "compliance.view_certification",
   "finance.view_farmerpayment",
+  "finance.view_own_payment",
   "admin.view_user",
   "admin.view_group",
   "admin.view_permission",
