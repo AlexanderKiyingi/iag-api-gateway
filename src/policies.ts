@@ -20,6 +20,8 @@ export interface RoutePolicy {
   requireAdmin?: boolean;
   /** At least one permission codename (app_label.action_model) */
   permissions?: string[];
+  /** Allow platform `admin` group read access without explicit fleet.view_* on the JWT */
+  fleetPlatformAdminRead?: boolean;
 }
 
 export const routePolicies: RoutePolicy[] = [
@@ -123,6 +125,7 @@ export const routePolicies: RoutePolicy[] = [
   {
     prefix: "/api/v1/fleet/api",
     permissions: fleetViewPermissions,
+    fleetPlatformAdminRead: true,
   },
   { prefix: "/api/v1/project-management/health", public: true },
   { prefix: "/api/v1/project-management/ready", public: true },

@@ -1,5 +1,12 @@
 import type { FastifyInstance, FastifyReply, FastifyRequest } from "fastify";
-import { createAuthClient } from "@iag/auth-client";
+import {
+  createAuthClient,
+  GROUP_ADMIN,
+  groupsFromClaims,
+  hasAnyPermission,
+  isStaff,
+  type PrincipalClaims,
+} from "@iag/auth-client";
 import { sendGatewayError } from "../errors.js";
 import { matchPolicy } from "../policies.js";
 import { isProxiedPath } from "../routes.js";
@@ -123,6 +130,13 @@ async function enforceAuthPolicy(
   }
 
   if (
+    policy.fleetPlatformAdminRead &&
+    canFleetPlatformAdminRead(principal, policy.permissions)
+  ) {
+    return;
+  }
+
+  if (
     !auth.authorize(principal, {
       permissions: policy.permissions,
       requireStaff: policy.requireStaff,
@@ -143,6 +157,19 @@ async function enforceAuthPolicy(
       require_admin: policy.requireAdmin,
     });
   }
+}
+
+function canFleetPlatformAdminRead(
+  principal: PrincipalClaims,
+  required: string[] | undefined,
+): boolean {
+  if (!required?.length) {
+    return false;
+  }
+  if (hasAnyPermission(principal, required)) {
+    return true;
+  }
+  return isStaff(principal) && groupsFromClaims(principal).includes(GROUP_ADMIN);
 }
 
 declare module "fastify" {
