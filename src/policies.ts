@@ -25,9 +25,12 @@ export interface RoutePolicy {
 export const routePolicies: RoutePolicy[] = [
   { prefix: "/health", public: true },
   { prefix: "/api/v1/authentication/oauth/token", public: true },
+  { prefix: "/api/v1/authentication/oauth/external", public: true },
   { prefix: "/api/v1/authentication/.well-known", public: true },
   { prefix: "/api/v1/authentication/health", public: true },
   { prefix: "/api/v1/authentication/ready", public: true },
+  { prefix: "/api/v1/authentication/v1/auth/forgot-password", public: true },
+  { prefix: "/api/v1/authentication/v1/auth/reset-password", public: true },
   { prefix: "/api/v1/authentication/v1/admin", requireAdmin: true },
   { prefix: "/api/v1/authentication/v1", authenticated: true },
   { prefix: "/api/v1/accounts/v1/admin", requireAdmin: true },
