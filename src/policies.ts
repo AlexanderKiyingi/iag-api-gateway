@@ -373,6 +373,10 @@ export const routePolicies: RoutePolicy[] = [
     permissions: ["traceability.view_events"],
   },
   {
+    prefix: "/api/v1/traceability/api/v1/admin/audit-logs",
+    permissions: ["audit.view_api_log"],
+  },
+  {
     prefix: "/api/v1/traceability/api/v1",
     permissions: ["traceability.view_chain", "traceability.view_events"],
   },
