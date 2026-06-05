@@ -221,6 +221,10 @@ export const routePolicies: RoutePolicy[] = [
     prefix: "/api/v1/contract-management/v1/admin/audit-logs",
     permissions: ["audit.read"],
   },
+  {
+    prefix: "/api/v1/contract-management/v1/admin/monitoring",
+    permissions: ["audit.read"],
+  },
   // Catch-all for the remaining workspace endpoints: authenticated callers
   // hit the service; per-endpoint permission enforcement happens inside the
   // service via the registered permission catalogue.
@@ -377,11 +381,19 @@ export const routePolicies: RoutePolicy[] = [
     permissions: ["audit.view_api_log"],
   },
   {
+    prefix: "/api/v1/traceability/api/v1/admin/monitoring",
+    permissions: ["audit.view_api_log"],
+  },
+  {
     prefix: "/api/v1/traceability/api/v1",
     permissions: ["traceability.view_chain", "traceability.view_events"],
   },
   { prefix: "/api/v1/mes/health", public: true },
   { prefix: "/api/v1/mes/ready", public: true },
+  {
+    prefix: "/api/v1/mes/api/v1/admin",
+    permissions: ["audit.view_api_log"],
+  },
   {
     prefix: "/api/v1/mes/api/v1",
     methods: ["POST", "PUT", "PATCH", "DELETE"],
@@ -393,6 +405,10 @@ export const routePolicies: RoutePolicy[] = [
   },
   { prefix: "/api/v1/quality-control/health", public: true },
   { prefix: "/api/v1/quality-control/ready", public: true },
+  {
+    prefix: "/api/v1/quality-control/api/v1/admin",
+    permissions: ["audit.view_api_log"],
+  },
   {
     prefix: "/api/v1/quality-control/api/v1",
     methods: ["POST", "PUT", "PATCH", "DELETE"],

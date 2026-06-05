@@ -43,6 +43,7 @@ const SAMPLE_PATHS: Record<string, string[]> = {
     "/api/v1/contract-management/v1/contracts",
     "/api/v1/contract-management/v1/audit",
     "/api/v1/contract-management/v1/admin/audit-logs",
+    "/api/v1/contract-management/v1/admin/monitoring/summary",
     "/api/v1/contract-management/v1/health",
   ],
   "/api/v1/crm": [
@@ -74,11 +75,17 @@ const SAMPLE_PATHS: Record<string, string[]> = {
     "/api/v1/traceability/api/v1/events",
     "/api/v1/traceability/api/v1/lots",
     "/api/v1/traceability/api/v1/admin/audit-logs",
+    "/api/v1/traceability/api/v1/admin/monitoring/summary",
   ],
-  "/api/v1/mes": ["/api/v1/mes/health", "/api/v1/mes/api/v1/work-orders"],
+  "/api/v1/mes": [
+    "/api/v1/mes/health",
+    "/api/v1/mes/api/v1/production-orders",
+    "/api/v1/mes/api/v1/admin/audit-logs",
+  ],
   "/api/v1/quality-control": [
     "/api/v1/quality-control/health",
-    "/api/v1/quality-control/api/v1/inspections",
+    "/api/v1/quality-control/api/v1/samples",
+    "/api/v1/quality-control/api/v1/admin/monitoring/summary",
   ],
 };
 
