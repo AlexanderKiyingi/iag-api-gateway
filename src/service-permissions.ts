@@ -115,6 +115,7 @@ export const scmViewPermissions = [
   "compliance.view_certification",
   "finance.view_farmerpayment",
   "finance.view_own_payment",
+  "finance.view_own_ap",
   "admin.view_user",
   "admin.view_group",
   "admin.view_permission",
