@@ -15,6 +15,7 @@ export interface GatewayErrorBody {
   detail?: string;
   reason?: string;
   required_permission?: string[];
+  required_all_permissions?: string[];
   require_staff?: boolean;
   require_admin?: boolean;
 }

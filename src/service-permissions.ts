@@ -4,6 +4,24 @@
  * codenames registered with iag-authentication (OR semantics at gateway).
  */
 
+/** Per-microservice gateway gate — user must hold the codename (AND with route perms). */
+export const PLATFORM_ACCESS = {
+  users: "platform.access_users",
+  finance: "platform.access_finance",
+  notifications: "platform.access_notifications",
+  reports: "platform.access_reports",
+  fleet: "platform.access_fleet",
+  procurement: "platform.access_procurement",
+  supplyChain: "platform.access_supply_chain",
+  traceability: "platform.access_traceability",
+  projectManagement: "platform.access_project_management",
+  contractManagement: "platform.access_contract_management",
+  crm: "platform.access_crm",
+  dms: "platform.access_dms",
+  mes: "platform.access_mes",
+  qualityControl: "platform.access_quality_control",
+} as const;
+
 const fleetEntities = [
   "vehicle",
   "driver",

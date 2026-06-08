@@ -120,6 +120,23 @@ async function enforceAuthPolicy(
     request.headers["x-correlation-id"] = request.requestId;
   }
 
+  if (policy.requireAllPermissions?.length) {
+    if (
+      !auth.authorize(principal, {
+        permissions: policy.requireAllPermissions,
+        all: true,
+      })
+    ) {
+      return sendGatewayError(
+        reply,
+        403,
+        "FORBIDDEN",
+        `Missing required permission (need all of: ${policy.requireAllPermissions.join(", ")})`,
+        { required_all_permissions: policy.requireAllPermissions },
+      );
+    }
+  }
+
   if (
     policy.authenticated &&
     !policy.permissions?.length &&

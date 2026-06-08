@@ -2,7 +2,7 @@ import assert from "node:assert/strict";
 import { describe, it } from "node:test";
 import { isProxiedPath } from "./routes.js";
 import { matchPolicy } from "./policies.js";
-import { scmViewPermissions } from "./service-permissions.js";
+import { PLATFORM_ACCESS, scmViewPermissions } from "./service-permissions.js";
 
 describe("gateway policies", () => {
   it("proxied paths without policy are identifiable", () => {
@@ -29,5 +29,19 @@ describe("gateway policies", () => {
   it("matches scm view permissions on supply-chain API", () => {
     const policy = matchPolicy("/api/v1/supply-chain/api/v1/farmers", "GET");
     assert.deepEqual(policy?.permissions, scmViewPermissions);
+    assert.deepEqual(policy?.requireAllPermissions, [
+      PLATFORM_ACCESS.supplyChain,
+    ]);
+  });
+
+  it("requires platform.access_crm on CRM catch-all", () => {
+    const policy = matchPolicy("/api/v1/crm/v1/contacts", "GET");
+    assert.deepEqual(policy?.requireAllPermissions, [PLATFORM_ACCESS.crm]);
+  });
+
+  it("allows self profile without platform.access_users", () => {
+    const policy = matchPolicy("/api/v1/users/v1/me/profile", "GET");
+    assert.equal(policy?.authenticated, true);
+    assert.equal(policy?.requireAllPermissions, undefined);
   });
 });
