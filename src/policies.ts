@@ -460,6 +460,23 @@ export const routePolicies: RoutePolicy[] = [
     prefix: "/api/v1/mes/api/v1",
     requireAllPermissions: [PLATFORM_ACCESS.mes],
   },
+  { prefix: "/api/v1/warehouse/health", public: true },
+  { prefix: "/api/v1/warehouse/ready", public: true },
+  { prefix: "/api/v1/warehouse/healthz", public: true },
+  {
+    prefix: "/api/v1/warehouse/api/v1/admin",
+    permissions: ["warehouse.admin.read"],
+    requireAllPermissions: [PLATFORM_ACCESS.warehouse],
+  },
+  {
+    prefix: "/api/v1/warehouse/api/v1",
+    methods: ["POST", "PUT", "PATCH", "DELETE"],
+    requireAllPermissions: [PLATFORM_ACCESS.warehouse],
+  },
+  {
+    prefix: "/api/v1/warehouse/api/v1",
+    requireAllPermissions: [PLATFORM_ACCESS.warehouse],
+  },
   { prefix: "/api/v1/quality-control/health", public: true },
   { prefix: "/api/v1/quality-control/ready", public: true },
   {

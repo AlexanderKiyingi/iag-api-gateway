@@ -89,6 +89,11 @@ export const upstreamRoutes: Record<string, UpstreamRoute> = {
     prefix: "/api/v1/traceability",
     rewritePrefix: "/",
   },
+  "/api/v1/warehouse": {
+    upstream: upstream("UPSTREAM_WAREHOUSE", "http://127.0.0.1:4005"),
+    prefix: "/api/v1/warehouse",
+    rewritePrefix: "/",
+  },
   "/api/v1/mes": {
     upstream: upstream("UPSTREAM_MES", "http://127.0.0.1:4003"),
     prefix: "/api/v1/mes",

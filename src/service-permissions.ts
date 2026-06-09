@@ -20,7 +20,42 @@ export const PLATFORM_ACCESS = {
   dms: "platform.access_dms",
   mes: "platform.access_mes",
   qualityControl: "platform.access_quality_control",
+  warehouse: "platform.access_warehouse",
 } as const;
+
+export const warehouseViewPermissions = [
+  "warehouse.view_overview",
+  "warehouse.view_location",
+  "warehouse.view_item",
+  "warehouse.view_stock",
+  "warehouse.view_receipt",
+  "warehouse.view_issue",
+  "warehouse.view_asset",
+];
+
+export const warehouseMutatePermissions = [
+  "warehouse.add_location",
+  "warehouse.change_location",
+  "warehouse.add_item",
+  "warehouse.change_item",
+  "warehouse.add_receipt",
+  "warehouse.post_receipt",
+  "warehouse.add_issue",
+  "warehouse.post_issue",
+  "warehouse.issue_consumable",
+  "warehouse.production_consume",
+  "warehouse.production_output",
+  "warehouse.add_transfer",
+  "warehouse.adjust_stock",
+  "warehouse.cycle_count",
+  "warehouse.add_asset",
+  "warehouse.checkin_asset",
+  "warehouse.checkout_asset",
+  "warehouse.add_pick",
+  "warehouse.confirm_pick",
+  "warehouse.add_pack",
+  "warehouse.admin.read",
+];
 
 const fleetEntities = [
   "vehicle",
