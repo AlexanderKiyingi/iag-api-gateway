@@ -19,6 +19,7 @@ export const PLATFORM_ACCESS = {
   crm: "platform.access_crm",
   dms: "platform.access_dms",
   mes: "platform.access_mes",
+  production: "platform.access_production",
   qualityControl: "platform.access_quality_control",
   warehouse: "platform.access_warehouse",
 } as const;
@@ -55,6 +56,57 @@ export const warehouseMutatePermissions = [
   "warehouse.confirm_pick",
   "warehouse.add_pack",
   "warehouse.admin.read",
+];
+
+export const mesViewPermissions = [
+  "mes.view_overview",
+  "mes.view_plant",
+  "mes.view_asset",
+  "mes.view_work_order",
+  "mes.view_downtime",
+  "mes.view_shift",
+  "mes.view_kpi",
+  "mes.view_alert",
+  "mes.view_telemetry",
+  "mes.view_ai",
+  "mes.view_energy",
+];
+
+export const mesMutatePermissions = [
+  "mes.change_plant",
+  "mes.change_asset",
+  "mes.add_work_order",
+  "mes.change_work_order",
+  "mes.complete_work_order",
+  "mes.add_downtime",
+  "mes.change_shift",
+  "mes.ack_alert",
+  "mes.change_ai",
+  "mes.add_energy",
+];
+
+export const productionViewPermissions = [
+  "production.view_overview",
+  "production.view_run",
+  "production.view_schedule",
+  "production.view_shift",
+];
+
+export const productionMutatePermissions = [
+  "production.add_run",
+  "production.change_run",
+  "production.change_schedule",
+  "production.change_shift",
+];
+
+export const productionAdminWritePermissions = [
+  "production.admin.write",
+  "production.sync_integrations",
+];
+
+export const mesAdminWritePermissions = [
+  "mes.admin.write",
+  "mes.sync_integrations",
 ];
 
 const fleetEntities = [

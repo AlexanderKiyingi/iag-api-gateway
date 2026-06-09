@@ -79,8 +79,22 @@ const SAMPLE_PATHS: Record<string, string[]> = {
   ],
   "/api/v1/mes": [
     "/api/v1/mes/health",
-    "/api/v1/mes/api/v1/production-orders",
+    "/api/v1/mes/api/v1/bootstrap",
+    "/api/v1/mes/api/v1/work-orders",
     "/api/v1/mes/api/v1/admin/audit-logs",
+  ],
+  "/api/v1/production": [
+    "/api/v1/production/health",
+    "/api/v1/production/api/v1/bootstrap",
+    "/api/v1/production/api/v1/production-runs",
+    "/api/v1/production/api/v1/production-orders/schedule",
+    "/api/v1/production/api/v1/admin/audit-logs",
+    "/api/v1/production/api/v1/admin/integrations/erp/sync",
+  ],
+  "/api/v1/warehouse": [
+    "/api/v1/warehouse/health",
+    "/api/v1/warehouse/api/v1/items",
+    "/api/v1/warehouse/api/v1/admin/audit-logs",
   ],
   "/api/v1/quality-control": [
     "/api/v1/quality-control/health",
@@ -131,6 +145,8 @@ describe("policy coverage", () => {
       { path: "/api/v1/procurement/api/v1/requisitions", method: "GET" },
       { path: "/api/v1/supply-chain/api/v1/farmers", method: "GET" },
       { path: "/api/v1/project-management/api/v1/projects", method: "GET" },
+      { path: "/api/v1/mes/api/v1/bootstrap", method: "GET" },
+      { path: "/api/v1/production/api/v1/production-runs", method: "POST" },
     ];
     for (const { path, method } of cases) {
       const policy = matchPolicy(path, method);

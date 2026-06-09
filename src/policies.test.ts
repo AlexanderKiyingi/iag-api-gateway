@@ -2,7 +2,7 @@ import assert from "node:assert/strict";
 import { describe, it } from "node:test";
 import { isProxiedPath } from "./routes.js";
 import { matchPolicy } from "./policies.js";
-import { PLATFORM_ACCESS, scmViewPermissions } from "./service-permissions.js";
+import { PLATFORM_ACCESS, mesAdminWritePermissions, mesMutatePermissions, mesViewPermissions, productionAdminWritePermissions, productionMutatePermissions, productionViewPermissions, scmViewPermissions } from "./service-permissions.js";
 
 describe("gateway policies", () => {
   it("proxied paths without policy are identifiable", () => {
@@ -37,6 +37,48 @@ describe("gateway policies", () => {
   it("requires platform.access_crm on CRM catch-all", () => {
     const policy = matchPolicy("/api/v1/crm/v1/contacts", "GET");
     assert.deepEqual(policy?.requireAllPermissions, [PLATFORM_ACCESS.crm]);
+  });
+
+  it("matches mes view permissions on MES GET API", () => {
+    const policy = matchPolicy("/api/v1/mes/api/v1/bootstrap", "GET");
+    assert.deepEqual(policy?.permissions, mesViewPermissions);
+    assert.deepEqual(policy?.requireAllPermissions, [PLATFORM_ACCESS.mes]);
+  });
+
+  it("matches mes mutate permissions on MES POST API", () => {
+    const policy = matchPolicy("/api/v1/mes/api/v1/work-orders", "POST");
+    assert.deepEqual(policy?.permissions, mesMutatePermissions);
+    assert.deepEqual(policy?.requireAllPermissions, [PLATFORM_ACCESS.mes]);
+  });
+
+  it("matches production view permissions on production GET API", () => {
+    const policy = matchPolicy("/api/v1/production/api/v1/bootstrap", "GET");
+    assert.deepEqual(policy?.permissions, productionViewPermissions);
+    assert.deepEqual(policy?.requireAllPermissions, [PLATFORM_ACCESS.production]);
+  });
+
+  it("matches production mutate permissions on production POST API", () => {
+    const policy = matchPolicy("/api/v1/production/api/v1/production-runs", "POST");
+    assert.deepEqual(policy?.permissions, productionMutatePermissions);
+    assert.deepEqual(policy?.requireAllPermissions, [PLATFORM_ACCESS.production]);
+  });
+
+  it("matches production admin write on admin POST API", () => {
+    const policy = matchPolicy(
+      "/api/v1/production/api/v1/admin/integrations/erp/sync",
+      "POST",
+    );
+    assert.deepEqual(policy?.permissions, productionAdminWritePermissions);
+    assert.deepEqual(policy?.requireAllPermissions, [PLATFORM_ACCESS.production]);
+  });
+
+  it("matches mes admin write on MES admin POST API", () => {
+    const policy = matchPolicy(
+      "/api/v1/mes/api/v1/admin/jobs/kpi-rollup",
+      "POST",
+    );
+    assert.deepEqual(policy?.permissions, mesAdminWritePermissions);
+    assert.deepEqual(policy?.requireAllPermissions, [PLATFORM_ACCESS.mes]);
   });
 
   it("allows self profile without platform.access_users", () => {
