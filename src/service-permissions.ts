@@ -19,6 +19,7 @@ export const PLATFORM_ACCESS = {
   crm: "platform.access_crm",
   dms: "platform.access_dms",
   mes: "platform.access_mes",
+  erp: "platform.access_erp",
   production: "platform.access_production",
   qualityControl: "platform.access_quality_control",
   warehouse: "platform.access_warehouse",
@@ -102,6 +103,27 @@ export const productionMutatePermissions = [
 export const productionAdminWritePermissions = [
   "production.admin.write",
   "production.sync_integrations",
+];
+
+export const erpViewPermissions = [
+  "erp.view_hr_overview",
+  "erp.view_employee",
+  "erp.view_leave",
+  "erp.view_attendance",
+  "erp.view_production_order",
+];
+
+export const erpMutatePermissions = [
+  "erp.change_employee",
+  "erp.change_leave",
+  "erp.approve_leave",
+  "erp.change_attendance",
+  "erp.change_production_order",
+];
+
+export const erpAdminReadPermissions = [
+  "erp.admin.read",
+  "audit.view_api_log",
 ];
 
 export const mesAdminWritePermissions = [

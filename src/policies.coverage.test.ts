@@ -83,6 +83,15 @@ const SAMPLE_PATHS: Record<string, string[]> = {
     "/api/v1/mes/api/v1/work-orders",
     "/api/v1/mes/api/v1/admin/audit-logs",
   ],
+  "/api/v1/erp": [
+    "/api/v1/erp/health",
+    "/api/v1/erp/api/v1/bootstrap",
+    "/api/v1/erp/api/v1/employees",
+    "/api/v1/erp/api/v1/employees/by-operator/OP-001",
+    "/api/v1/erp/api/v1/leave-requests",
+    "/api/v1/erp/api/v1/production-orders",
+    "/api/v1/erp/api/v1/admin/audit-logs",
+  ],
   "/api/v1/production": [
     "/api/v1/production/health",
     "/api/v1/production/api/v1/bootstrap",

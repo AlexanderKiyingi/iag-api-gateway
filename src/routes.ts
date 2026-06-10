@@ -99,6 +99,11 @@ export const upstreamRoutes: Record<string, UpstreamRoute> = {
     prefix: "/api/v1/mes",
     rewritePrefix: "/",
   },
+  "/api/v1/erp": {
+    upstream: upstream("UPSTREAM_ERP", "http://127.0.0.1:4001"),
+    prefix: "/api/v1/erp",
+    rewritePrefix: "/",
+  },
   "/api/v1/production": {
     upstream: upstream("UPSTREAM_PRODUCTION", "http://127.0.0.1:4002"),
     prefix: "/api/v1/production",
