@@ -4,6 +4,8 @@ export interface UpstreamRoute {
   upstream: string;
   prefix: string;
   rewritePrefix: string;
+  /** Enable WebSocket upgrade proxying for this upstream (e.g. /v1/ws/*). */
+  websocket?: boolean;
 }
 
 function upstream(envKey: string, fallback: string): string {
@@ -73,6 +75,7 @@ export const upstreamRoutes: Record<string, UpstreamRoute> = {
     upstream: upstream("UPSTREAM_CONTRACT_MANAGEMENT", "http://127.0.0.1:4103"),
     prefix: "/api/v1/contract-management",
     rewritePrefix: "/",
+    websocket: true,
   },
   "/api/v1/crm": {
     upstream: upstream("UPSTREAM_CRM", "http://127.0.0.1:4101"),

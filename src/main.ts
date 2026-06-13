@@ -62,6 +62,9 @@ const service = await createService({
         upstream: config.upstream,
         prefix: config.prefix,
         rewritePrefix: config.rewritePrefix,
+        // Proxy WebSocket upgrades for upstreams that opt in (e.g. the
+        // contract-management workspace socket at /v1/ws/workspace).
+        websocket: config.websocket ?? false,
         replyOptions: {
           onError: createProxyOnError(config.prefix, {
             exposeDetail: exposeErrorDetail,
