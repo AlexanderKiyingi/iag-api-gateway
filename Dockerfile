@@ -2,12 +2,24 @@ FROM node:22-alpine AS build
 WORKDIR /app
 RUN corepack enable && corepack prepare pnpm@9.15.4 --activate
 
+# Copy only manifests first so the dependency-install layer is cached
+# independently of source changes. Editing src/ or packages/ no longer busts
+# `pnpm install`, which otherwise re-resolves the whole OTel/Fastify tree on
+# every deploy. Keep this list in sync with packages/* (pnpm needs each
+# workspace package.json present at install time).
 COPY package.json pnpm-lock.yaml pnpm-workspace.yaml tsconfig.base.json tsconfig.json ./
+COPY packages/auth-client/package.json ./packages/auth-client/
+COPY packages/config/package.json ./packages/config/
+COPY packages/observability/package.json ./packages/observability/
+COPY packages/service-core/package.json ./packages/service-core/
+
+RUN pnpm install --frozen-lockfile
+
+# Now bring in sources and build. A source-only change reuses the cached
+# install layer above.
 COPY packages ./packages
 COPY src ./src
 COPY config ./config
-
-RUN pnpm install --frozen-lockfile
 RUN pnpm run build
 
 FROM node:22-alpine

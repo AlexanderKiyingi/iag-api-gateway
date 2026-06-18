@@ -1,0 +1,26 @@
+# Keep the build context small and deterministic. Dependencies are installed
+# inside the image (pnpm install), and dist is produced by the build — never
+# ship the host copies.
+node_modules
+**/node_modules
+dist
+**/dist
+.turbo
+
+# VCS / CI / editor noise
+.git
+.gitignore
+.github
+.vscode
+.idea
+
+# Local env & secrets (never bake into an image layer)
+.env
+.env.*
+*.pem
+*.key
+
+# Logs / test / coverage artifacts
+*.log
+coverage
+**/*.tsbuildinfo
