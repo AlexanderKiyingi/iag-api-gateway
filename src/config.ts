@@ -33,6 +33,10 @@ const gatewayEnvSchema = baseEnvSchema
     RATE_LIMIT_MAX: z.coerce.number().int().positive().default(300),
     RATE_LIMIT_WINDOW_MS: z.coerce.number().int().positive().default(60_000),
     OAUTH_RATE_LIMIT_MAX: z.coerce.number().int().positive().default(30),
+    /** Max incoming request-header size (bytes). Raised above Node's ~16 KB
+     *  default so large multi-aud / granular-permission JWTs (+ cookies) don't
+     *  get rejected with HTTP 431 before reaching an upstream. */
+    MAX_HEADER_SIZE: z.coerce.number().int().positive().default(65_536),
     /** OTLP endpoint for traces. Empty disables OTel. */
     OTEL_EXPORTER_OTLP_ENDPOINT: z.string().default("http://otel-collector:4318"),
   });

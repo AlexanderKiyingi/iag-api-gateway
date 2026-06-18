@@ -12,6 +12,14 @@ export interface CreateServiceOptions {
   serviceName: string;
   port?: number;
   trustProxy?: boolean;
+  /**
+   * Maximum size (bytes) of incoming HTTP request headers. Overrides Node's
+   * ~16 KB default per-server. Large multi-audience / granular-permission JWTs
+   * combined with cookies can exceed 16 KB and get rejected with HTTP 431
+   * before any handler runs, so the gateway raises this. Omit to keep Node's
+   * default.
+   */
+  maxHeaderSize?: number;
   registerRoutes?: (app: FastifyInstance, logger: Logger) => Promise<void>;
   readyCheck?: () => Promise<ReadyCheckResult>;
 }
@@ -41,6 +49,9 @@ export async function createService(
   const app = Fastify({
     logger: false,
     trustProxy: options.trustProxy ?? false,
+    ...(options.maxHeaderSize
+      ? { http: { maxHeaderSize: options.maxHeaderSize } }
+      : {}),
   });
 
   app.get("/health", async () => ({

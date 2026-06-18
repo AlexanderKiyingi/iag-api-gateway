@@ -31,6 +31,7 @@ const service = await createService({
   serviceName: "api-gateway",
   port: env.PORT,
   trustProxy: env.TRUST_PROXY,
+  maxHeaderSize: env.MAX_HEADER_SIZE,
   readyCheck: createReadyCheck(env.READY_PROBE_UPSTREAMS),
   async registerRoutes(app, logger) {
     registerGatewayErrorHandler(app, { exposeDetail: exposeErrorDetail });
