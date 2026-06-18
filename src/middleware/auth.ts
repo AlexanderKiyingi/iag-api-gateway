@@ -77,14 +77,13 @@ async function enforceAuthPolicy(
   const header = request.headers.authorization;
   if (header?.startsWith("Bearer ")) {
     token = header.slice("Bearer ".length);
-  } else if (
-    request.headers.upgrade?.toLowerCase() === "websocket" &&
-    path.includes("/ws/")
-  ) {
+  } else if (request.headers.upgrade?.toLowerCase() === "websocket") {
     // Browsers cannot set an Authorization header on a WebSocket, so clients
     // pass the access token as ?token=. Lift it to a Bearer header for the
-    // upstream. Applies to any service exposing a /ws/ upgrade endpoint
-    // (project-management, contract-management, …).
+    // upstream. The Upgrade: websocket header is the authoritative signal, so
+    // this applies to every service exposing a WS upgrade endpoint
+    // (project-management /v1/ws/workspace, contract-management, the
+    // notifications in-app socket at /v1/realtime/ws, …).
     const q = request.url.includes("?") ? request.url.split("?")[1] : "";
     const fromQuery = new URLSearchParams(q).get("token");
     if (fromQuery) {

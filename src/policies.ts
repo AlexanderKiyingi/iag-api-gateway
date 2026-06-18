@@ -49,16 +49,10 @@ export const routePolicies: RoutePolicy[] = [
   { prefix: "/api/v1/authentication/v1", authenticated: true },
   { prefix: "/api/v1/accounts/v1/admin", requireAdmin: true },
   { prefix: "/api/v1/notifications/v1/admin", requireAdmin: true },
-  /** @deprecated Legacy prefix — mirrors /api/v1/finance RBAC until clients migrate */
+  /** @deprecated Legacy prefix — mirrors /api/v1/finance RBAC until clients migrate.
+   *  Fine-grained RBAC is delegated to the finance service (see /api/v1/finance/v1). */
   {
     prefix: "/api/v1/accounts/v1",
-    methods: ["POST", "PUT", "PATCH", "DELETE"],
-    permissions: ["finance.change_ledger", "finance.change_operations"],
-    requireAllPermissions: [PLATFORM_ACCESS.finance],
-  },
-  {
-    prefix: "/api/v1/accounts/v1",
-    permissions: ["finance.view_ledger", "finance.view_operations"],
     requireAllPermissions: [PLATFORM_ACCESS.finance],
   },
   {
@@ -88,15 +82,13 @@ export const routePolicies: RoutePolicy[] = [
     authenticated: true,
   },
   { prefix: "/api/v1/finance/v1/admin", requireAdmin: true },
+  // Fine-grained finance RBAC — granular capability permissions (manage_fx,
+  // close_period, submit_efris, …), tiered approvals, and entity scoping — is
+  // enforced by the finance service. The gateway only checks platform access, so
+  // granting a narrow finance permission (without the broad change_ledger) works
+  // end-to-end instead of being blocked here.
   {
     prefix: "/api/v1/finance/v1",
-    methods: ["POST", "PUT", "PATCH", "DELETE"],
-    permissions: ["finance.change_ledger", "finance.change_operations"],
-    requireAllPermissions: [PLATFORM_ACCESS.finance],
-  },
-  {
-    prefix: "/api/v1/finance/v1",
-    permissions: ["finance.view_ledger", "finance.view_operations"],
     requireAllPermissions: [PLATFORM_ACCESS.finance],
   },
   { prefix: "/api/v1/finance/health", public: true },

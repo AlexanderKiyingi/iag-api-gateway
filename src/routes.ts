@@ -23,6 +23,9 @@ export const upstreamRoutes: Record<string, UpstreamRoute> = {
     upstream: upstream("UPSTREAM_NOTIFICATIONS", "http://127.0.0.1:3002"),
     prefix: "/api/v1/notifications",
     rewritePrefix: "/",
+    // In-app realtime WebSocket at /v1/realtime/ws (SSE at /v1/realtime/stream
+    // is plain HTTP and proxies without this flag).
+    websocket: true,
   },
   "/api/v1/reports": {
     upstream: upstream("UPSTREAM_REPORTS", "http://127.0.0.1:3003"),
@@ -44,6 +47,8 @@ export const upstreamRoutes: Record<string, UpstreamRoute> = {
     upstream: upstream("UPSTREAM_FINANCE", "http://127.0.0.1:3006"),
     prefix: "/api/v1/finance",
     rewritePrefix: "/",
+    // Realtime channel at /api/v1/finance/v1/ws/events (auth over the socket).
+    websocket: true,
   },
   "/api/v1/supply-chain": {
     upstream: upstream("UPSTREAM_SUPPLY_CHAIN", "http://127.0.0.1:4007"),
