@@ -65,6 +65,8 @@ export const upstreamRoutes: Record<string, UpstreamRoute> = {
     upstream: upstream("UPSTREAM_FLEET", "http://127.0.0.1:4008"),
     prefix: "/api/v1/fleet",
     rewritePrefix: "/",
+    // Realtime WebSocket bridge at /api/v1/fleet/api/realtime/ws (?token= auth).
+    websocket: true,
   },
   "/api/v1/project-management": {
     upstream: upstream("UPSTREAM_PROJECT_MANAGEMENT", "http://127.0.0.1:4102"),
