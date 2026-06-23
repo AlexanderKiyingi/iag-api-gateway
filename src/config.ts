@@ -1,4 +1,4 @@
-import { z } from "zod";
+import { z, type ZodIssue } from "zod";
 import { baseEnvSchema } from "@iag/config";
 import { corsHasWildcard, parseCORSOrigins } from "./middleware/cors.js";
 
@@ -19,6 +19,7 @@ const gatewayEnvSchema = baseEnvSchema
     CORS_ALLOWED_ORIGINS: z.array(z.string().min(1)).default([
       "http://localhost:3000",
       "http://localhost:5173",
+      "https://financeiag.vercel.app",
     ]),
     /** Set true when behind nginx / a load balancer (X-Forwarded-*). */
     TRUST_PROXY: z
@@ -51,7 +52,7 @@ export function loadGatewayEnv(): GatewayEnv {
   });
   if (!parsed.success) {
     const message = parsed.error.issues
-      .map((issue) => `${issue.path.join(".")}: ${issue.message}`)
+      .map((issue: ZodIssue) => `${issue.path.join(".")}: ${issue.message}`)
       .join("\n");
     throw new Error(`Invalid environment configuration:\n${message}`);
   }

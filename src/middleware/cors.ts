@@ -42,7 +42,7 @@ export function parseCORSOrigins(source: NodeJS.ProcessEnv): string[] {
     source.CORS_ORIGIN?.trim() ||
     source.ALLOWED_ORIGINS?.trim() ||
     source.CORS_ORIGINS?.trim() ||
-    "http://localhost:3000,http://localhost:5173";
+    "http://localhost:3000,http://localhost:5173,https://financeiag.vercel.app";
 
   if (raw === "*") {
     return ["*"];
