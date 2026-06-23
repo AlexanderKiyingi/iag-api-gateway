@@ -53,6 +53,11 @@ async function enforceAuthPolicy(
   reply: FastifyReply,
   auth: ReturnType<typeof createAuthClient>,
 ) {
+  // CORS preflight is handled by @fastify/cors; never require a Bearer token.
+  if (request.method === "OPTIONS") {
+    return;
+  }
+
   const path = request.url.split("?")[0] ?? request.url;
   const policy = matchPolicy(path, request.method);
 
