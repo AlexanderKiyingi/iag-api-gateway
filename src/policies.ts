@@ -73,6 +73,15 @@ export const routePolicies: RoutePolicy[] = [
     prefix: "/api/v1/notifications/v1/realtime",
     requireAllPermissions: [PLATFORM_ACCESS.notifications],
   },
+  {
+    // Per-user inbox / mark-read / preferences. The notifications service scopes
+    // every read to the caller's JWT subject, so any authenticated user may reach
+    // their own notifications (e.g. the in-app bell). Sensitive admin / dispatch /
+    // templates / realtime paths are gated by the longer-prefix policies above
+    // (matchPolicy is longest-prefix-first, so those still win).
+    prefix: "/api/v1/notifications/v1",
+    authenticated: true,
+  },
   { prefix: "/api/v1/reports/health", public: true },
   { prefix: "/api/v1/reports/ready", public: true },
   { prefix: "/api/v1/accounts/health", public: true },
