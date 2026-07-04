@@ -16,6 +16,12 @@ const SAMPLE_PATHS: Record<string, string[]> = {
     "/api/v1/notifications/health",
   ],
   "/api/v1/reports": ["/api/v1/reports/health", "/api/v1/reports/v1/summary"],
+  "/api/v1/chat": [
+    "/api/v1/chat/health",
+    "/api/v1/chat/v1/conversations",
+    "/api/v1/chat/v1/realtime/ws",
+    "/api/v1/chat/internal/threads",
+  ],
   "/api/v1/accounts": [
     "/api/v1/accounts/health",
     "/api/v1/accounts/v1/chart-of-accounts",

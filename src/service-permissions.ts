@@ -18,6 +18,7 @@ export const PLATFORM_ACCESS = {
   contractManagement: "platform.access_contract_management",
   crm: "platform.access_crm",
   dms: "platform.access_dms",
+  chat: "platform.access_chat",
   mes: "platform.access_mes",
   erp: "platform.access_erp",
   production: "platform.access_production",

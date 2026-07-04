@@ -32,6 +32,14 @@ export const upstreamRoutes: Record<string, UpstreamRoute> = {
     prefix: "/api/v1/reports",
     rewritePrefix: "/",
   },
+  "/api/v1/chat": {
+    upstream: upstream("UPSTREAM_CHAT", "http://127.0.0.1:4104"),
+    prefix: "/api/v1/chat",
+    rewritePrefix: "/",
+    // Realtime chat WebSocket at /api/v1/chat/v1/realtime/ws (?token= auth over
+    // the socket); SSE at /v1/realtime/stream is plain HTTP and needs no flag.
+    websocket: true,
+  },
   "/api/v1/users": {
     upstream: upstream("UPSTREAM_USERS", "http://127.0.0.1:3005"),
     prefix: "/api/v1/users",

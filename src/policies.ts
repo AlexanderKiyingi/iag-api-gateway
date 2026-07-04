@@ -84,6 +84,29 @@ export const routePolicies: RoutePolicy[] = [
   },
   { prefix: "/api/v1/reports/health", public: true },
   { prefix: "/api/v1/reports/ready", public: true },
+  { prefix: "/api/v1/chat/health", public: true },
+  { prefix: "/api/v1/chat/ready", public: true },
+  { prefix: "/api/v1/chat/healthz", public: true },
+  // Realtime WS/SSE — the chat service authenticates the socket (?token=) and
+  // enforces per-conversation membership; the gateway only checks platform access.
+  {
+    prefix: "/api/v1/chat/v1/realtime",
+    requireAllPermissions: [PLATFORM_ACCESS.chat],
+  },
+  // Service-to-service internal API (system messages / thread upsert). Callers
+  // present a service-account token; the gateway checks platform access and the
+  // chat service enforces RequireService.
+  {
+    prefix: "/api/v1/chat/internal",
+    requireAllPermissions: [PLATFORM_ACCESS.chat],
+  },
+  // Fine-grained chat RBAC (chat.send, chat.manage_participants, chat.link,
+  // chat.moderate) and per-conversation membership are enforced by the chat
+  // service; the gateway only gates platform access.
+  {
+    prefix: "/api/v1/chat/v1",
+    requireAllPermissions: [PLATFORM_ACCESS.chat],
+  },
   { prefix: "/api/v1/accounts/health", public: true },
   { prefix: "/api/v1/accounts/ready", public: true },
   {
