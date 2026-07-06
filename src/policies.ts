@@ -178,6 +178,8 @@ export const routePolicies: RoutePolicy[] = [
   { prefix: "/api/v1/project-management/health", public: true },
   { prefix: "/api/v1/project-management/ready", public: true },
   { prefix: "/api/v1/project-management/healthz", public: true },
+  { prefix: "/api/v1/project-management/public/forms", public: true },
+  { prefix: "/api/v1/project-management/shared", public: true },
   {
     prefix: "/api/v1/project-management/api/v1/workspace/members",
     methods: ["POST", "PATCH", "DELETE"],
