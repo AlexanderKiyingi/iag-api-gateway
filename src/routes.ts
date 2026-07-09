@@ -108,6 +108,13 @@ export const upstreamRoutes: Record<string, UpstreamRoute> = {
     prefix: "/api/v1/traceability",
     rewritePrefix: "/",
   },
+  /** TraceAG portal BFF — owns farmers/batches/blockchain/contracts and fronts
+   *  payments + farmer-services + ai-platform for the coffee super-app hub. */
+  "/api/v1/traceag-portal": {
+    upstream: upstream("UPSTREAM_TRACEAG_PORTAL", "http://127.0.0.1:4020"),
+    prefix: "/api/v1/traceag-portal",
+    rewritePrefix: "/",
+  },
   "/api/v1/warehouse": {
     upstream: upstream("UPSTREAM_WAREHOUSE", "http://127.0.0.1:4005"),
     prefix: "/api/v1/warehouse",

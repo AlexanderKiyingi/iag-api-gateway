@@ -479,6 +479,13 @@ export const routePolicies: RoutePolicy[] = [
     permissions: ["traceability.view_chain", "traceability.view_events"],
     requireAllPermissions: [PLATFORM_ACCESS.traceability],
   },
+  { prefix: "/api/v1/traceag-portal/health", public: true },
+  { prefix: "/api/v1/traceag-portal/ready", public: true },
+  // TraceAG portal BFF. The portal is a farmer super-app aggregator with no
+  // fine-grained RBAC of its own; it trusts a valid platform token (which
+  // carries every audience) and enforces access downstream in payments /
+  // farmer-services. The gateway only requires an authenticated caller.
+  { prefix: "/api/v1/traceag-portal/api", authenticated: true },
   { prefix: "/api/v1/mes/health", public: true },
   { prefix: "/api/v1/mes/ready", public: true },
   {
