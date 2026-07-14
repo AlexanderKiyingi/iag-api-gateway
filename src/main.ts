@@ -73,6 +73,25 @@ const service = await createService({
         },
       });
       logger.info({ prefix: config.prefix, upstream: config.upstream }, "registered upstream");
+
+      // Loopback upstream in production almost always means an unset/wrong
+      // UPSTREAM_* var (routes.ts falls back to 127.0.0.1:<port>). Left as-is
+      // it surfaces later as a mystery 503 UPSTREAM_ERROR at request time, so
+      // flag it loudly at boot where the deploy logs make it obvious.
+      if (env.NODE_ENV === "production") {
+        let host = "";
+        try {
+          host = new URL(config.upstream).hostname;
+        } catch {
+          host = "";
+        }
+        if (host === "127.0.0.1" || host === "localhost" || host === "::1") {
+          logger.warn(
+            { prefix: config.prefix, upstream: config.upstream },
+            "upstream resolves to loopback in production — UPSTREAM_* env var is unset or wrong; requests to this prefix will 503",
+          );
+        }
+      }
     }
 
     app.get("/api/v1", async () => ({
