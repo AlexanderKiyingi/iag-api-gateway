@@ -40,16 +40,33 @@ const service = await createService({
     registerStripTrustHeaders(app);
     registerRequestId(app);
 
+    // Per-window ceiling by route class. `request.ip` is only a real, per-client
+    // key when TRUST_PROXY is set to the edge hop count (see config.ts); with the
+    // default it is the edge IP and the limiter is effectively one global bucket.
+    // NOTE: the store is @fastify/rate-limit's in-memory default — correct for a
+    // single gateway instance; a horizontally-scaled gateway needs a shared
+    // (Redis) store, which requires adding an ioredis dependency.
+    const OAUTH_TOKEN_PATH = "/api/v1/authentication/oauth/token";
+    const SENSITIVE_AUTH_PATHS = [
+      "/api/v1/authentication/v1/auth/forgot-password",
+      "/api/v1/authentication/v1/auth/reset-password",
+      "/api/v1/authentication/oauth/revoke",
+      "/api/v1/authentication/v1/service/provision-user",
+      "/api/v1/authentication/v1/tokens",
+      "/api/v1/authentication/v1/share-tokens",
+    ];
     await app.register(rateLimit, {
       global: true,
       timeWindow: env.RATE_LIMIT_WINDOW_MS,
       keyGenerator: (request) => request.ip,
-      max: (request, _key) =>
-        (request.url.split("?")[0] ?? "").includes(
-          "/api/v1/authentication/oauth/token",
-        )
-          ? env.OAUTH_RATE_LIMIT_MAX
-          : env.RATE_LIMIT_MAX,
+      max: (request, _key) => {
+        const path = request.url.split("?")[0] ?? "";
+        if (path.includes(OAUTH_TOKEN_PATH)) return env.OAUTH_RATE_LIMIT_MAX;
+        if (SENSITIVE_AUTH_PATHS.some((p) => path.includes(p))) {
+          return env.SENSITIVE_RATE_LIMIT_MAX;
+        }
+        return env.RATE_LIMIT_MAX;
+      },
     });
 
     registerAuthMiddleware(app, {

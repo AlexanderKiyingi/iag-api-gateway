@@ -11,7 +11,12 @@ export interface ReadyCheckResult {
 export interface CreateServiceOptions {
   serviceName: string;
   port?: number;
-  trustProxy?: boolean;
+  /**
+   * Fastify `trustProxy` value for client-IP derivation. `boolean` (trust
+   * none/all), a `number` of proxy hops to trust (the safe, non-spoofable
+   * choice behind a known edge), or an IP/CIDR allowlist.
+   */
+  trustProxy?: boolean | number | string | string[];
   /**
    * Maximum size (bytes) of incoming HTTP request headers. Overrides Node's
    * ~16 KB default per-server. Large multi-audience / granular-permission JWTs
