@@ -13,6 +13,7 @@ import { registerRequestId } from "./middleware/request-id.js";
 import { registerSecurityHeaders } from "./middleware/security-headers.js";
 import { registerStripTrustHeaders } from "./middleware/strip-headers.js";
 import { createReadyCheck } from "./ready.js";
+import { registerApprovalsDesk } from "./approvals-desk.js";
 import { sortedUpstreamRoutes, upstreamRoutes } from "./routes.js";
 
 const env = loadGatewayEnv();
@@ -74,6 +75,10 @@ const service = await createService({
       issuer: env.JWT_ISSUER,
       audience: env.JWT_AUDIENCE,
     });
+
+    // Registered before the proxies so the aggregated desk answers on
+    // /api/v1/approvals/desk rather than being swallowed by a prefix match.
+    registerApprovalsDesk(app);
 
     for (const config of sortedUpstreamRoutes()) {
       await app.register(httpProxy, {
