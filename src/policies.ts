@@ -197,6 +197,16 @@ export const routePolicies: RoutePolicy[] = [
     permissions: ["pm.view_workspace", "pm.mutate_workspace"],
     requireAllPermissions: [PLATFORM_ACCESS.projectManagement],
   },
+  // Aggregated approval desk. Served by the gateway itself rather than
+  // proxied, so without a policy the auth hook would skip it entirely — it only
+  // enforces where a policy matches, and 403s unmatched paths only when they
+  // are proxied. Authentication is asserted here; which desks the caller
+  // actually holds stays with each upstream.
+  {
+    prefix: "/api/v1/approvals/desk",
+    methods: ["GET"],
+    authenticated: true,
+  },
   { prefix: "/api/v1/procurement/health", public: true },
   { prefix: "/api/v1/procurement/ready", public: true },
   { prefix: "/api/v1/procurement/healthz", public: true },

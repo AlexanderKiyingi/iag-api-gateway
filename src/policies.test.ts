@@ -87,3 +87,16 @@ describe("gateway policies", () => {
     assert.equal(policy?.requireAllPermissions, undefined);
   });
 });
+
+describe("aggregated approval desk", () => {
+  it("is authenticated by the gateway, not left to the upstreams", () => {
+    const policy = matchPolicy("/api/v1/approvals/desk", "GET");
+    assert.ok(policy, "the desk route must have a policy — the auth hook skips unmatched non-proxied paths");
+    assert.equal(policy?.authenticated, true);
+    assert.notEqual(policy?.public, true);
+  });
+
+  it("is not a proxied path, so it cannot be swallowed by an upstream prefix", () => {
+    assert.equal(isProxiedPath("/api/v1/approvals/desk"), false);
+  });
+});
