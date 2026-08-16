@@ -1,10 +1,12 @@
 import rateLimit from "@fastify/rate-limit";
 import httpProxy from "@fastify/http-proxy";
+import type { FastifyReply } from "fastify";
 import { createService } from "@iag/service-core";
 import { loadGatewayEnv } from "./config.js";
 import {
   createProxyOnError,
   registerGatewayErrorHandler,
+  unconfiguredUpstreamBody,
 } from "./errors.js";
 import { initOTel, shutdownOTel } from "./otel.js";
 import { registerAuthMiddleware } from "./middleware/auth.js";
@@ -13,8 +15,14 @@ import { registerRequestId } from "./middleware/request-id.js";
 import { registerSecurityHeaders } from "./middleware/security-headers.js";
 import { registerStripTrustHeaders } from "./middleware/strip-headers.js";
 import { createReadyCheck } from "./ready.js";
+import { registerCacheHeaders } from "./cache.js";
 import { registerApprovalsDesk } from "./approvals-desk.js";
-import { sortedUpstreamRoutes, upstreamRoutes } from "./routes.js";
+import {
+  isLoopbackUpstream,
+  sortedUpstreamRoutes,
+  unconfiguredUpstreams,
+  upstreamRoutes,
+} from "./routes.js";
 
 const env = loadGatewayEnv();
 const SHUTDOWN_TIMEOUT_MS = 30_000;
@@ -40,6 +48,8 @@ const service = await createService({
     registerSecurityHeaders(app);
     registerStripTrustHeaders(app);
     registerRequestId(app);
+    // Before the proxies, so the onSend hook is in scope for proxied replies.
+    registerCacheHeaders(app);
 
     // Per-window ceiling by route class. `request.ip` is only a real, per-client
     // key when TRUST_PROXY is set to the edge hop count (see config.ts); with the
@@ -56,6 +66,22 @@ const service = await createService({
       "/api/v1/authentication/v1/tokens",
       "/api/v1/authentication/v1/share-tokens",
     ];
+    // TRUST_PROXY decides whether the limiter's per-IP key is real. Both wrong
+    // values fail quietly, in opposite directions, so say so at boot where the
+    // deploy log makes it obvious rather than leaving it to be discovered as
+    // either an outage or a bypass.
+    if (env.NODE_ENV === "production") {
+      if (env.TRUST_PROXY === true) {
+        logger.warn(
+          "TRUST_PROXY=true trusts a client-supplied X-Forwarded-For, so any caller can forge their rate-limit key and their logged IP — set it to the edge hop count (usually 1) instead",
+        );
+      } else if (env.TRUST_PROXY === false) {
+        logger.warn(
+          "TRUST_PROXY is unset/false behind an edge, so request.ip is the edge address — every client shares one rate-limit bucket; set it to the edge hop count (usually 1)",
+        );
+      }
+    }
+
     await app.register(rateLimit, {
       global: true,
       timeWindow: env.RATE_LIMIT_WINDOW_MS,
@@ -67,6 +93,15 @@ const service = await createService({
           return env.SENSITIVE_RATE_LIMIT_MAX;
         }
         return env.RATE_LIMIT_MAX;
+      },
+      // Throttling is currently invisible: a user hitting the ceiling reports
+      // "the app is broken sometimes" and nothing correlates it. Log it so the
+      // ceiling is observable before it is raised.
+      onExceeding: (request, key) => {
+        request.log.info({ key, url: request.url }, "rate limit approaching");
+      },
+      onExceeded: (request, key) => {
+        request.log.warn({ key, url: request.url }, "rate limit exceeded");
       },
     });
 
@@ -81,6 +116,25 @@ const service = await createService({
     registerApprovalsDesk(app);
 
     for (const config of sortedUpstreamRoutes()) {
+      // A loopback upstream in production means the UPSTREAM_* variable is unset
+      // and routes.ts fell back to its local default. Proxying there produces a
+      // connection-refused 502 that reads as "this service is down", sending
+      // whoever debugs it to look at a service that may not be deployed at all.
+      // Answer plainly instead, and name the variable to set.
+      if (env.NODE_ENV === "production" && isLoopbackUpstream(config.upstream)) {
+        const body = unconfiguredUpstreamBody(config);
+        const handler = async (_request: unknown, reply: FastifyReply) =>
+          reply.status(503).send(body);
+        app.all(config.prefix, handler);
+        app.all(`${config.prefix}/*`, handler);
+
+        logger.error(
+          { prefix: config.prefix, envKey: config.envKey, upstream: config.upstream },
+          "upstream not configured — every request to this prefix will 503; set the env var or remove the route",
+        );
+        continue;
+      }
+
       await app.register(httpProxy, {
         upstream: config.upstream,
         prefix: config.prefix,
@@ -95,30 +149,25 @@ const service = await createService({
         },
       });
       logger.info({ prefix: config.prefix, upstream: config.upstream }, "registered upstream");
-
-      // Loopback upstream in production almost always means an unset/wrong
-      // UPSTREAM_* var (routes.ts falls back to 127.0.0.1:<port>). Left as-is
-      // it surfaces later as a mystery 503 UPSTREAM_ERROR at request time, so
-      // flag it loudly at boot where the deploy logs make it obvious.
-      if (env.NODE_ENV === "production") {
-        let host = "";
-        try {
-          host = new URL(config.upstream).hostname;
-        } catch {
-          host = "";
-        }
-        if (host === "127.0.0.1" || host === "localhost" || host === "::1") {
-          logger.warn(
-            { prefix: config.prefix, upstream: config.upstream },
-            "upstream resolves to loopback in production — UPSTREAM_* env var is unset or wrong; requests to this prefix will 503",
-          );
-        }
-      }
     }
 
+    const unconfigured = env.NODE_ENV === "production" ? unconfiguredUpstreams() : [];
+    if (unconfigured.length > 0) {
+      logger.error(
+        {
+          count: unconfigured.length,
+          missing: unconfigured.map((r) => r.envKey),
+        },
+        "gateway started with unconfigured upstreams",
+      );
+    }
+
+    // One place to see which routes are live without reading boot logs or
+    // probing each prefix by hand.
     app.get("/api/v1", async () => ({
       platform: "IAG",
       routes: Object.keys(upstreamRoutes),
+      unconfigured: unconfigured.map((r) => ({ prefix: r.prefix, envKey: r.envKey })),
     }));
   },
 });
