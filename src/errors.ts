@@ -76,6 +76,29 @@ export function upstreamUnavailableMessage(upstreamPrefix: string): string {
   }
 }
 
+/**
+ * Body for a route whose upstream was never configured.
+ *
+ * Distinct from upstreamUnavailableMessage on purpose. "Service is unavailable"
+ * describes a deployed service that is down, and sends whoever reads it looking
+ * at that service's logs and health. An unset UPSTREAM_* variable is a gateway
+ * configuration gap — the service may not be deployed at all — so the response
+ * names the variable and stops the search at the right place.
+ */
+export function unconfiguredUpstreamBody(route: {
+  prefix: string;
+  envKey: string;
+}): GatewayErrorBody {
+  return {
+    error: {
+      code: "UPSTREAM_NOT_CONFIGURED",
+      message: `No upstream is configured for ${route.prefix}. Set ${route.envKey} on the gateway, or remove the route.`,
+    },
+    upstream: route.prefix,
+    reason: `${route.envKey} is unset`,
+  };
+}
+
 export function createProxyOnError(
   upstreamPrefix: string,
   options: { exposeDetail?: boolean } = {},
