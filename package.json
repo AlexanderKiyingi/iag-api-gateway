@@ -9,7 +9,7 @@
     "dev": "tsx watch src/main.ts",
     "start": "node dist/main.js",
     "typecheck": "pnpm -r run typecheck && tsc -p tsconfig.json --noEmit",
-    "test": "pnpm run build && node --test dist/*.test.js",
+    "test": "pnpm run build && node --test \"dist/**/*.test.js\"",
     "clean": "pnpm -r run clean && rimraf dist"
   },
   "dependencies": {

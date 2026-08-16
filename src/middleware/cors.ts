@@ -50,8 +50,20 @@ export function parseCORSOrigins(source: NodeJS.ProcessEnv): string[] {
 
   return raw
     .split(",")
-    .map((part) => part.trim())
+    .map((part) => normalizeOrigin(part))
     .filter(Boolean);
+}
+
+/**
+ * An Origin header is only ever scheme://host[:port] — never a path, never a
+ * trailing slash. Allowlists are hand-maintained in env vars and routinely
+ * pasted from a browser address bar, so "https://app.example.com/" is a common
+ * entry that silently never matches and reads as "CORS is broken for that one
+ * app". Normalising here makes the allowlist forgiving of the way it is
+ * actually written.
+ */
+function normalizeOrigin(value: string): string {
+  return value.trim().replace(/\/+$/, "");
 }
 
 export function corsHasWildcard(origins: string[]): boolean {
