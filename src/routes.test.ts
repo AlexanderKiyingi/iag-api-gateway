@@ -139,4 +139,57 @@ describe("gateway upstream routing", () => {
       rewriteUpstreamPath("/api/v1/finance/v1/ledger/entries", finance),
     );
   });
+
+  it("points chat at the port iag-chat actually listens on", () => {
+    assert.equal(
+      upstreamRoutes["/api/v1/chat"].upstream,
+      "http://127.0.0.1:8085",
+    );
+  });
 });
+
+/**
+ * The env shape that production actually had: finance configured, the legacy
+ * alias left unset. Asserted against a fresh module instance because routes are
+ * resolved once at import.
+ */
+describe("legacy accounts alias under a production-shaped env", () => {
+  it("follows finance when only UPSTREAM_FINANCE is set", async () => {
+    const previous = {
+      finance: process.env.UPSTREAM_FINANCE,
+      accounts: process.env.UPSTREAM_ACCOUNTS,
+    };
+    process.env.UPSTREAM_FINANCE = "http://iag-finance.railway.internal:3006";
+    delete process.env.UPSTREAM_ACCOUNTS;
+
+    try {
+      // Query suffix defeats the module cache. Held in a variable so TypeScript
+      // does not try to resolve the suffixed specifier on disk.
+      const specifier = "./routes.js?accounts-alias";
+      const fresh = (await import(specifier)) as typeof import("./routes.js");
+      assert.equal(
+        fresh.upstreamRoutes["/api/v1/accounts"].upstream,
+        "http://iag-finance.railway.internal:3006",
+      );
+      // The point of the alias following finance: it can no longer be the one
+      // dead prefix on an otherwise healthy gateway.
+      assert.equal(
+        fresh
+          .unconfiguredUpstreams()
+          .some((route) => route.prefix === "/api/v1/accounts"),
+        false,
+      );
+    } finally {
+      restoreEnv("UPSTREAM_FINANCE", previous.finance);
+      restoreEnv("UPSTREAM_ACCOUNTS", previous.accounts);
+    }
+  });
+});
+
+function restoreEnv(key: string, value: string | undefined): void {
+  if (value === undefined) {
+    delete process.env[key];
+  } else {
+    process.env[key] = value;
+  }
+}

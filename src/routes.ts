@@ -61,7 +61,10 @@ export const upstreamRoutes: Record<string, UpstreamRoute> = {
   },
   "/api/v1/chat": {
     envKey: "UPSTREAM_CHAT",
-    upstream: upstream("UPSTREAM_CHAT", "http://127.0.0.1:4104"),
+    // 8085 is what iag-chat actually listens on (its EXPOSE, its .env.example
+    // and its PORT default all agree). The 4104 this used to carry belongs to
+    // no service, so running chat locally never reached it.
+    upstream: upstream("UPSTREAM_CHAT", "http://127.0.0.1:8085"),
     prefix: "/api/v1/chat",
     rewritePrefix: "/",
     // Realtime chat WebSocket at /api/v1/chat/v1/realtime/ws (?token= auth over
@@ -77,7 +80,16 @@ export const upstreamRoutes: Record<string, UpstreamRoute> = {
   /** @deprecated Legacy finance prefix — use /api/v1/finance. RBAC mirrors finance.*; user/org data is under /api/v1/users. */
   "/api/v1/accounts": {
     envKey: "UPSTREAM_ACCOUNTS",
-    upstream: upstream("UPSTREAM_ACCOUNTS", "http://127.0.0.1:3006"),
+    // An alias resolves to whatever finance resolved to. Giving it its own
+    // variable meant production could configure finance and leave this unset,
+    // which is exactly what happened: the alias alone was dead while the
+    // service it aliases was healthy. Setting UPSTREAM_ACCOUNTS still wins, for
+    // the one case that would justify it — pointing the legacy prefix at a
+    // different finance deployment during a migration.
+    upstream: upstream(
+      "UPSTREAM_ACCOUNTS",
+      upstream("UPSTREAM_FINANCE", "http://127.0.0.1:3006"),
+    ),
     prefix: "/api/v1/accounts",
     rewritePrefix: "/",
   },
