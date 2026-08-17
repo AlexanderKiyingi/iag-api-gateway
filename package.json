@@ -13,18 +13,19 @@
     "clean": "pnpm -r run clean && rimraf dist"
   },
   "dependencies": {
-    "@iag/auth-client": "workspace:*",
-    "@iag/config": "workspace:*",
-    "@iag/service-core": "workspace:*",
     "@fastify/cors": "^10.0.2",
     "@fastify/http-proxy": "^11.1.2",
     "@fastify/rate-limit": "^10.2.2",
+    "@iag/auth-client": "workspace:*",
+    "@iag/config": "workspace:*",
+    "@iag/service-core": "workspace:*",
     "@opentelemetry/auto-instrumentations-node": "^0.50.0",
     "@opentelemetry/exporter-trace-otlp-http": "^0.53.0",
     "@opentelemetry/resources": "^1.27.0",
     "@opentelemetry/sdk-node": "^0.53.0",
     "@opentelemetry/semantic-conventions": "^1.27.0",
     "fastify": "^5.2.1",
+    "ioredis": "^6.0.0",
     "zod": "^3.24.2"
   },
   "devDependencies": {

@@ -71,6 +71,17 @@ const gatewayEnvSchema = baseEnvSchema
      *  default so large multi-aud / granular-permission JWTs (+ cookies) don't
      *  get rejected with HTTP 431 before reaching an upstream. */
     MAX_HEADER_SIZE: z.coerce.number().int().positive().default(65_536),
+    /**
+     * Redis connection for the shared rate-limit budget, e.g.
+     * redis://default:pass@host:6379.
+     *
+     * Empty keeps the limiter in this process's memory, which is correct for a
+     * single instance and wrong for more than one: each replica would keep its
+     * own counters, so N replicas serve N times the configured limit and a
+     * given user is counted in whichever bucket they happen to land in. Set
+     * this before scaling the gateway past one instance.
+     */
+    REDIS_URL: z.string().default(""),
     /** OTLP endpoint for traces. Empty disables OTel. */
     OTEL_EXPORTER_OTLP_ENDPOINT: z.string().default("http://otel-collector:4318"),
   });

@@ -16,6 +16,7 @@ import { registerSecurityHeaders } from "./middleware/security-headers.js";
 import { registerStripTrustHeaders } from "./middleware/strip-headers.js";
 import { createReadyCheck } from "./ready.js";
 import { registerCacheHeaders } from "./cache.js";
+import { createRateLimitStore, rateLimitBootMessage } from "./ratelimit-store.js";
 import { registerApprovalsDesk } from "./approvals-desk.js";
 import {
   isLoopbackUpstream,
@@ -54,9 +55,8 @@ const service = await createService({
     // Per-window ceiling by route class. `request.ip` is only a real, per-client
     // key when TRUST_PROXY is set to the edge hop count (see config.ts); with the
     // default it is the edge IP and the limiter is effectively one global bucket.
-    // NOTE: the store is @fastify/rate-limit's in-memory default — correct for a
-    // single gateway instance; a horizontally-scaled gateway needs a shared
-    // (Redis) store, which requires adding an ioredis dependency.
+    // The store is Redis-backed when REDIS_URL is set and in-process otherwise;
+    // only the former is correct for more than one gateway instance.
     const OAUTH_TOKEN_PATH = "/api/v1/authentication/oauth/token";
     const SENSITIVE_AUTH_PATHS = [
       "/api/v1/authentication/v1/auth/forgot-password",
@@ -82,10 +82,24 @@ const service = await createService({
       }
     }
 
+    // One budget across replicas when Redis is configured, this process's own
+    // when it is not. See ratelimit-store.ts for why an absent or broken Redis
+    // must not stop the gateway answering.
+    const rateLimitStore = createRateLimitStore(env.REDIS_URL, logger);
+    const rateLimitBoot = rateLimitBootMessage(
+      rateLimitStore,
+      env.NODE_ENV === "production",
+    );
+    logger[rateLimitBoot.level](rateLimitBoot.message);
+
     await app.register(rateLimit, {
       global: true,
       timeWindow: env.RATE_LIMIT_WINDOW_MS,
       keyGenerator: (request) => request.ip,
+      redis: rateLimitStore.client,
+      // A limiter that cannot reach its store must not take requests down with
+      // it: count when possible, serve regardless.
+      skipOnError: true,
       max: (request, _key) => {
         const path = request.url.split("?")[0] ?? "";
         if (path.includes(OAUTH_TOKEN_PATH)) return env.OAUTH_RATE_LIMIT_MAX;
