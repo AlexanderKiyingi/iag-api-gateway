@@ -19,7 +19,6 @@ services:
       READY_PROBE_UPSTREAMS: ${READY_PROBE_UPSTREAMS:-false}
       UPSTREAM_AUTHENTICATION: ${UPSTREAM_AUTHENTICATION:-http://host.docker.internal:3001}
       UPSTREAM_NOTIFICATIONS: ${UPSTREAM_NOTIFICATIONS:-http://host.docker.internal:3002}
-      UPSTREAM_REPORTS: ${UPSTREAM_REPORTS:-http://host.docker.internal:3003}
       UPSTREAM_USERS: ${UPSTREAM_USERS:-http://host.docker.internal:3005}
       UPSTREAM_ACCOUNTS: ${UPSTREAM_ACCOUNTS:-http://host.docker.internal:3006}
       UPSTREAM_FINANCE: ${UPSTREAM_FINANCE:-http://host.docker.internal:3006}

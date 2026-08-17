@@ -33,11 +33,6 @@ const REWRITE_CASES: Array<{
     upstreamKey: "/api/v1/notifications",
   },
   {
-    gatewayPath: "/api/v1/reports/v1/reports",
-    upstreamPath: "/v1/reports",
-    upstreamKey: "/api/v1/reports",
-  },
-  {
     gatewayPath: "/api/v1/users/v1/me/profile",
     upstreamPath: "/v1/me/profile",
     upstreamKey: "/api/v1/users",

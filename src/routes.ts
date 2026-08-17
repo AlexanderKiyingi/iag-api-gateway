@@ -53,12 +53,6 @@ export const upstreamRoutes: Record<string, UpstreamRoute> = {
     // is plain HTTP and proxies without this flag).
     websocket: true,
   },
-  "/api/v1/reports": {
-    envKey: "UPSTREAM_REPORTS",
-    upstream: upstream("UPSTREAM_REPORTS", "http://127.0.0.1:3003"),
-    prefix: "/api/v1/reports",
-    rewritePrefix: "/",
-  },
   "/api/v1/chat": {
     envKey: "UPSTREAM_CHAT",
     // 8085 is what iag-chat actually listens on (its EXPOSE, its .env.example

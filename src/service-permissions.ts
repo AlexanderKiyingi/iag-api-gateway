@@ -9,7 +9,6 @@ export const PLATFORM_ACCESS = {
   users: "platform.access_users",
   finance: "platform.access_finance",
   notifications: "platform.access_notifications",
-  reports: "platform.access_reports",
   fleet: "platform.access_fleet",
   procurement: "platform.access_procurement",
   supplyChain: "platform.access_supply_chain",

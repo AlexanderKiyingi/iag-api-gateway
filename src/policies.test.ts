@@ -11,16 +11,8 @@ describe("gateway policies", () => {
     assert.equal(isProxiedPath("/api/v1"), false);
   });
 
-  it("matches public health on reports", () => {
-    const policy = matchPolicy("/api/v1/reports/health", "GET");
-    assert.equal(policy?.public, true);
-  });
-
-  it("matches permission on reports API", () => {
-    const policy = matchPolicy("/api/v1/reports/v1/summary", "GET");
-    assert.deepEqual(policy?.permissions, ["reports.view_report"]);
-  });
-
+  // The reports equivalents of these two lived here until the route was
+  // removed; the supply-chain pair below covers the same two policy shapes.
   it("matches public supply-chain QR", () => {
     const policy = matchPolicy("/api/v1/supply-chain/public/q/demo", "GET");
     assert.equal(policy?.public, true);

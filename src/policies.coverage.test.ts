@@ -15,7 +15,6 @@ const SAMPLE_PATHS: Record<string, string[]> = {
     "/api/v1/notifications/v1/inbox",
     "/api/v1/notifications/health",
   ],
-  "/api/v1/reports": ["/api/v1/reports/health", "/api/v1/reports/v1/summary"],
   "/api/v1/chat": [
     "/api/v1/chat/health",
     "/api/v1/chat/v1/conversations",
