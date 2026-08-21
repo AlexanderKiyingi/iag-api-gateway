@@ -623,11 +623,20 @@ export const routePolicies: RoutePolicy[] = [
   },
 ];
 
+/**
+ * Longest-prefix-first policy order, computed once.
+ *
+ * matchPolicy runs in the gateway's onRequest hook, so it is on the critical
+ * path of every request the platform serves — and it used to copy and sort this
+ * 165-entry array on each one, on a single-threaded event loop, to produce an
+ * order that is constant for the process lifetime.
+ */
+const policiesByPrefixLength: readonly RoutePolicy[] = [...routePolicies].sort(
+  (a, b) => b.prefix.length - a.prefix.length,
+);
+
 export function matchPolicy(path: string, method: string): RoutePolicy | undefined {
-  const sorted = [...routePolicies].sort(
-    (a, b) => b.prefix.length - a.prefix.length,
-  );
-  return sorted.find((p) => {
+  return policiesByPrefixLength.find((p) => {
     if (path !== p.prefix && !path.startsWith(p.prefix + "/")) {
       return false;
     }

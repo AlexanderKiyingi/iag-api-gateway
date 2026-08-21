@@ -23,6 +23,7 @@
     "@opentelemetry/exporter-trace-otlp-http": "^0.53.0",
     "@opentelemetry/resources": "^1.27.0",
     "@opentelemetry/sdk-node": "^0.53.0",
+    "@opentelemetry/sdk-trace-base": "^1.26.0",
     "@opentelemetry/semantic-conventions": "^1.27.0",
     "fastify": "^5.2.1",
     "ioredis": "^6.0.0",

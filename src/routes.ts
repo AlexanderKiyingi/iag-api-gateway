@@ -201,8 +201,7 @@ export function unconfiguredUpstreams(): UpstreamRoute[] {
 
 /** Longest-prefix match for gateway paths (fleet IoT before fleet, etc.). */
 export function matchUpstreamRoute(gatewayPath: string): UpstreamRoute | undefined {
-  const sorted = sortedUpstreamRoutes();
-  return sorted.find(
+  return routesByPrefixLength.find(
     (route) =>
       gatewayPath === route.prefix ||
       gatewayPath.startsWith(`${route.prefix}/`),
@@ -230,11 +229,24 @@ export function rewriteUpstreamPath(
   return `${route.rewritePrefix}${suffix}`;
 }
 
-/** Upstream routes sorted longest prefix first — use when registering proxies. */
-export function sortedUpstreamRoutes(): UpstreamRoute[] {
-  return Object.values(upstreamRoutes).sort(
-    (a, b) => b.prefix.length - a.prefix.length,
-  );
+/**
+ * Upstream routes sorted longest prefix first — use when registering proxies.
+ *
+ * Computed once. `upstreamRoutes` is resolved from the environment at module
+ * load and never mutated afterwards, so re-sorting per call bought nothing —
+ * and matchUpstreamRoute calls this, which isProxiedPath calls, which the auth
+ * hook calls on every unmatched request.
+ *
+ * The returned array is frozen: callers get the shared instance now, so a
+ * caller that sorted or spliced it in place would corrupt routing for every
+ * subsequent request rather than just its own.
+ */
+const routesByPrefixLength: readonly UpstreamRoute[] = Object.freeze(
+  Object.values(upstreamRoutes).sort((a, b) => b.prefix.length - a.prefix.length),
+);
+
+export function sortedUpstreamRoutes(): readonly UpstreamRoute[] {
+  return routesByPrefixLength;
 }
 
 /** True when the path is proxied to a platform service (must have an explicit route policy). */
