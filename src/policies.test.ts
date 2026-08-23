@@ -2,7 +2,7 @@ import assert from "node:assert/strict";
 import { describe, it } from "node:test";
 import { isProxiedPath } from "./routes.js";
 import { matchPolicy } from "./policies.js";
-import { PLATFORM_ACCESS, mesAdminWritePermissions, mesMutatePermissions, mesViewPermissions, productionAdminWritePermissions, productionMutatePermissions, productionViewPermissions, scmViewPermissions } from "./service-permissions.js";
+import { PLATFORM_ACCESS, erpMutatePermissions, erpViewPermissions, mesAdminWritePermissions, mesMutatePermissions, mesViewPermissions, productionAdminWritePermissions, productionMutatePermissions, productionViewPermissions, scmViewPermissions } from "./service-permissions.js";
 
 describe("gateway policies", () => {
   it("proxied paths without policy are identifiable", () => {
@@ -41,6 +41,89 @@ describe("gateway policies", () => {
     const policy = matchPolicy("/api/v1/mes/api/v1/work-orders", "POST");
     assert.deepEqual(policy?.permissions, mesMutatePermissions);
     assert.deepEqual(policy?.requireAllPermissions, [PLATFORM_ACCESS.mes]);
+  });
+
+  // These two lists are an any-of pre-filter: a caller holding none of the
+  // codenames is refused here, before iag-erp's own RequirePermission runs. A
+  // codename the service enforces but the gateway omits therefore makes that
+  // whole module unreachable for the role that owns it — which is what had
+  // happened to payroll, compensation, recruitment, lifecycle, performance,
+  // disciplinary, training and the HR record store.
+  //
+  // Source of truth: iag-erp internal/models/permissions.go,
+  // PermissionDescriptors(). Update both together.
+  const ERP_SERVICE_CATALOGUE = [
+    "erp.view_hr_overview",
+    "erp.view_employee",
+    "erp.change_employee",
+    "erp.view_leave",
+    "erp.change_leave",
+    "erp.approve_leave",
+    "erp.view_attendance",
+    "erp.change_attendance",
+    "erp.view_all_hr",
+    "erp.view_compensation",
+    "erp.change_compensation",
+    "erp.view_payslip",
+    "erp.view_payroll",
+    "erp.run_payroll",
+    "erp.approve_payroll",
+    "erp.post_payroll",
+    "erp.view_recruitment",
+    "erp.change_recruitment",
+    "erp.view_lifecycle",
+    "erp.change_lifecycle",
+    "erp.complete_checklist_item",
+    "erp.view_performance",
+    "erp.change_performance",
+    "erp.manage_performance",
+    "erp.view_disciplinary",
+    "erp.change_disciplinary",
+    "erp.view_training",
+    "erp.change_training",
+    "erp.view_hr_records",
+    "erp.change_hr_records",
+    "erp.view_production_order",
+    "erp.change_production_order",
+  ];
+
+  it("admits every erp permission the service enforces", () => {
+    const gated = new Set([
+      ...erpViewPermissions,
+      ...erpMutatePermissions,
+      // Admin-only codenames have their own narrower policy on /admin.
+      "erp.admin.read",
+    ]);
+    const unreachable = ERP_SERVICE_CATALOGUE.filter((p) => !gated.has(p));
+    assert.deepEqual(
+      unreachable,
+      [],
+      `iag-erp enforces these but the gateway admits nobody holding only them: ${unreachable.join(", ")}`,
+    );
+  });
+
+  it("does not gate erp routes on codenames the service never registers", () => {
+    const registered = new Set(ERP_SERVICE_CATALOGUE);
+    const unknown = [...erpViewPermissions, ...erpMutatePermissions].filter(
+      (p) => !registered.has(p),
+    );
+    assert.deepEqual(
+      unknown,
+      [],
+      `Not in iag-erp's PermissionDescriptors(): ${unknown.join(", ")}`,
+    );
+  });
+
+  it("matches erp view permissions on ERP GET API", () => {
+    const policy = matchPolicy("/api/v1/erp/api/v1/employees", "GET");
+    assert.deepEqual(policy?.permissions, erpViewPermissions);
+    assert.deepEqual(policy?.requireAllPermissions, [PLATFORM_ACCESS.erp]);
+  });
+
+  it("matches erp mutate permissions on ERP POST API", () => {
+    const policy = matchPolicy("/api/v1/erp/api/v1/payroll/runs", "POST");
+    assert.deepEqual(policy?.permissions, erpMutatePermissions);
+    assert.deepEqual(policy?.requireAllPermissions, [PLATFORM_ACCESS.erp]);
   });
 
   it("matches production view permissions on production GET API", () => {

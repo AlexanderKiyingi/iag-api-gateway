@@ -105,11 +105,38 @@ export const productionAdminWritePermissions = [
   "production.sync_integrations",
 ];
 
+/**
+ * These two lists are an any-of pre-filter: a caller missing every codename
+ * here is refused at the edge, before iag-erp's own RequirePermission ever
+ * runs. So a partial list does not merely under-document — it makes whole
+ * modules unreachable for the roles that own them.
+ *
+ * Both were copies of iag-erp's HR-and-production surface as it stood when the
+ * route was added, and the service has since registered twenty more codenames:
+ * payroll, compensation, payslips, recruitment, lifecycle, performance,
+ * disciplinary, training and the generic HR record store. A payroll officer
+ * holding `erp.view_payroll` and nothing else was getting a gateway 403 on a
+ * service that would have served them.
+ *
+ * Source of truth is iag-erp's own internal/models/permissions.go —
+ * PermissionDescriptors(), which the service self-registers at boot. Keep these
+ * in step with it; policies.coverage.test.ts pins the pairing.
+ */
 export const erpViewPermissions = [
   "erp.view_hr_overview",
   "erp.view_employee",
   "erp.view_leave",
   "erp.view_attendance",
+  "erp.view_all_hr",
+  "erp.view_compensation",
+  "erp.view_payslip",
+  "erp.view_payroll",
+  "erp.view_recruitment",
+  "erp.view_lifecycle",
+  "erp.view_performance",
+  "erp.view_disciplinary",
+  "erp.view_training",
+  "erp.view_hr_records",
   "erp.view_production_order",
 ];
 
@@ -118,6 +145,18 @@ export const erpMutatePermissions = [
   "erp.change_leave",
   "erp.approve_leave",
   "erp.change_attendance",
+  "erp.change_compensation",
+  "erp.run_payroll",
+  "erp.approve_payroll",
+  "erp.post_payroll",
+  "erp.change_recruitment",
+  "erp.change_lifecycle",
+  "erp.complete_checklist_item",
+  "erp.change_performance",
+  "erp.manage_performance",
+  "erp.change_disciplinary",
+  "erp.change_training",
+  "erp.change_hr_records",
   "erp.change_production_order",
 ];
 
