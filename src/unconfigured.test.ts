@@ -1,4 +1,5 @@
 import assert from "node:assert/strict";
+import { readFileSync } from "node:fs";
 import { describe, it } from "node:test";
 import { unconfiguredUpstreamBody, upstreamUnavailableMessage } from "./errors.js";
 import { isLoopbackUpstream, upstreamRoutes } from "./routes.js";
@@ -56,5 +57,50 @@ describe("route table", () => {
   it("gives each route a distinct env key, so one variable cannot silently drive two prefixes", () => {
     const keys = Object.values(upstreamRoutes).map((r) => r.envKey);
     assert.equal(new Set(keys).size, keys.length);
+  });
+});
+
+/**
+ * The production env template is the only place a deployer learns which
+ * UPSTREAM_* variables exist. A route added to routes.ts without a matching
+ * line there deploys with the loopback fallback still in place — which on
+ * Railway is the gateway's own container, so the route answers "connection
+ * refused" and looks like the upstream service is down.
+ *
+ * That already happened once with UPSTREAM_ERP and was fixed by hand. This
+ * catches the next one at build time instead.
+ */
+describe("production env template", () => {
+  const templatePath = new URL("../config/.env.production.example", import.meta.url);
+  const template = readFileSync(templatePath, "utf8");
+  const assigned = new Set(
+    template
+      .split("\n")
+      .map((line) => /^(UPSTREAM_[A-Z0-9_]+)=/.exec(line.trim())?.[1])
+      .filter((key): key is string => Boolean(key)),
+  );
+
+  it("assigns every UPSTREAM_* variable the route table reads", () => {
+    const missing = Object.values(upstreamRoutes)
+      .map((route) => route.envKey)
+      .filter((key) => !assigned.has(key))
+      .sort();
+    assert.deepEqual(
+      missing,
+      [],
+      `routes.ts reads these UPSTREAM_* variables that config/.env.production.example never assigns: ${missing.join(", ")}`,
+    );
+  });
+
+  // The reverse drift is quieter but still misleading: a deployer sets a
+  // variable the gateway stopped reading and believes the route is wired.
+  it("does not assign variables no route reads", () => {
+    const read = new Set(Object.values(upstreamRoutes).map((route) => route.envKey));
+    const orphaned = [...assigned].filter((key) => !read.has(key)).sort();
+    assert.deepEqual(
+      orphaned,
+      [],
+      `config/.env.production.example assigns these UPSTREAM_* variables that no route reads: ${orphaned.join(", ")}`,
+    );
   });
 });
