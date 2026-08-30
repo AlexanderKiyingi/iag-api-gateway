@@ -45,6 +45,12 @@ export const routePolicies: RoutePolicy[] = [
   { prefix: "/api/v1/authentication/ready", public: true },
   { prefix: "/api/v1/authentication/v1/auth/forgot-password", public: true },
   { prefix: "/api/v1/authentication/v1/auth/reset-password", public: true },
+  // Email verification. Both are unauthenticated by design: the verify link is
+  // opened from a mail client with no session, and resend is addressed by email
+  // rather than by principal. The auth service rate limits both and answers
+  // identically for unknown addresses, so neither enumerates accounts.
+  { prefix: "/api/v1/authentication/v1/auth/verify-email", public: true },
+  { prefix: "/api/v1/authentication/v1/auth/resend-verification", public: true },
   { prefix: "/api/v1/authentication/v1/admin", requireAdmin: true },
   { prefix: "/api/v1/authentication/v1", authenticated: true },
   { prefix: "/api/v1/accounts/v1/admin", requireAdmin: true },
