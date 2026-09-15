@@ -203,7 +203,7 @@ export const fleetViewPermissions = [
     "vehicle_inspection", "inspection_template", "fuel_request",
     "weighbridge_ticket", "vehicle_diagnostic", "driver_hos_log",
     "driver_safety_score", "fuel_card_reconciliation", "service_reminder",
-    "emissions_entry", "route_eta", "carrier",
+    "emissions_entry", "route_eta", "carrier", "trip_pod",
   ].map((e) => `fleet.view_${e}`),
 ];
 
@@ -241,7 +241,7 @@ export const fleetMutatePermissions = [
     "vehicle_inspection", "inspection_template", "fuel_request",
     "weighbridge_ticket", "vehicle_diagnostic", "driver_hos_log",
     "driver_safety_score", "fuel_card_reconciliation", "service_reminder",
-    "emissions_entry", "route_eta", "carrier",
+    "emissions_entry", "route_eta", "carrier", "trip_pod",
   ].flatMap((e) => [`fleet.add_${e}`, `fleet.change_${e}`, `fleet.delete_${e}`]),
 ];
 
