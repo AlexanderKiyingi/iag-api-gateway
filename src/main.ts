@@ -37,10 +37,15 @@ await initOTel({
   environment: env.NODE_ENV,
 });
 
+// See the TRUST_PROXY note in config.ts for why unset means one hop here.
+const PRODUCTION_EDGE_HOPS = 1;
+const trustProxy =
+  env.TRUST_PROXY ?? (env.NODE_ENV === "production" ? PRODUCTION_EDGE_HOPS : false);
+
 const service = await createService({
   serviceName: "api-gateway",
   port: env.PORT,
-  trustProxy: env.TRUST_PROXY,
+  trustProxy,
   maxHeaderSize: env.MAX_HEADER_SIZE,
   readyCheck: createReadyCheck(env.READY_PROBE_UPSTREAMS),
   async registerRoutes(app, logger) {
@@ -71,13 +76,17 @@ const service = await createService({
     // deploy log makes it obvious rather than leaving it to be discovered as
     // either an outage or a bypass.
     if (env.NODE_ENV === "production") {
-      if (env.TRUST_PROXY === true) {
+      if (trustProxy === true) {
         logger.warn(
           "TRUST_PROXY=true trusts a client-supplied X-Forwarded-For, so any caller can forge their rate-limit key and their logged IP — set it to the edge hop count (usually 1) instead",
         );
-      } else if (env.TRUST_PROXY === false) {
+      } else if (trustProxy === false) {
         logger.warn(
-          "TRUST_PROXY is unset/false behind an edge, so request.ip is the edge address — every client shares one rate-limit bucket; set it to the edge hop count (usually 1)",
+          "TRUST_PROXY=false behind an edge makes request.ip the edge address — every client shares one rate-limit bucket; set it to the edge hop count (usually 1)",
+        );
+      } else if (env.TRUST_PROXY === undefined) {
+        logger.info(
+          `TRUST_PROXY unset — trusting ${PRODUCTION_EDGE_HOPS} edge hop so rate limits key on the real client IP; set TRUST_PROXY explicitly if the gateway sits behind a different topology`,
         );
       }
     }
