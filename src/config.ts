@@ -52,8 +52,17 @@ const gatewayEnvSchema = baseEnvSchema
      * rate limiter keys on the real, non-spoofable client IP. "true" trusts a
      * client-supplied X-Forwarded-For and is spoofable; "false" collapses all
      * traffic to the edge IP.
+     *
+     * Unset resolves in main.ts: one hop in production (the gateway is only
+     * ever deployed behind Railway's edge, and the unset value collapsed every
+     * client into one /oauth/token bucket — a platform-wide login outage the
+     * moment any one frontend refreshed too eagerly), nothing in development.
+     * An explicit "false" is still honoured for a deployment with no edge.
      */
-    TRUST_PROXY: z.string().default("false").transform(parseTrustProxy),
+    TRUST_PROXY: z
+      .string()
+      .optional()
+      .transform((v) => (v === undefined ? undefined : parseTrustProxy(v))),
     /** Probe upstream /ready endpoints when handling GET /ready. */
     READY_PROBE_UPSTREAMS: z
       .enum(["true", "false"])

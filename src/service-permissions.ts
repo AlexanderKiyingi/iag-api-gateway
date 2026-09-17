@@ -195,6 +195,16 @@ export const fleetViewPermissions = [
   "fleet.view_telemetry",
   "fleet.view_notification",
   "fleet.view_pm_schedule",
+  // 0049 taxonomy and 0057 operations records. The gate is OR across this
+  // list, so these matter only for a principal whose sole fleet grant is one
+  // of them — a weighbridge clerk, say.
+  ...[
+    "vehicle_category", "permit_class", "permit_authorisation",
+    "vehicle_inspection", "inspection_template", "fuel_request",
+    "weighbridge_ticket", "vehicle_diagnostic", "driver_hos_log",
+    "driver_safety_score", "fuel_card_reconciliation", "service_reminder",
+    "emissions_entry", "route_eta", "carrier", "trip_pod",
+  ].map((e) => `fleet.view_${e}`),
 ];
 
 export const fleetMutatePermissions = [
@@ -225,6 +235,14 @@ export const fleetMutatePermissions = [
   "fleet.export_data",
   "fleet.import_data",
   "fleet.reset_data",
+  // 0049 taxonomy and 0057 operations records, full verb set.
+  ...[
+    "vehicle_category", "permit_class", "permit_authorisation",
+    "vehicle_inspection", "inspection_template", "fuel_request",
+    "weighbridge_ticket", "vehicle_diagnostic", "driver_hos_log",
+    "driver_safety_score", "fuel_card_reconciliation", "service_reminder",
+    "emissions_entry", "route_eta", "carrier", "trip_pod",
+  ].flatMap((e) => [`fleet.add_${e}`, `fleet.change_${e}`, `fleet.delete_${e}`]),
 ];
 
 export const procurementViewPermissions = [
