@@ -214,6 +214,15 @@ export const fleetMutatePermissions = [
     `fleet.delete_${e}`,
   ]),
   "fleet.approve_mileage_jmp",
+  // Fuel and service-request decisions. fleet gates `POST /api/fuel-requests/
+  // :id/approve` and `POST /api/requests/:id/approve` on these, but the gateway
+  // 403'd a principal whose only fleet grant was the approve permission before
+  // the request ever reached fleet's own RequirePerm.
+  "fleet.approve_fuel_request",
+  "fleet.approve_service_request",
+  "fleet.approve_assignment",
+  "fleet.approve_deployment",
+  "fleet.approve_jmp",
   "fleet.complete_toolbox_jmp",
   "fleet.complete_jmp",
   "fleet.cancel_jmp",
