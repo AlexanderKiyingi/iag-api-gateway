@@ -26,11 +26,17 @@ jobs:
       - name: Install dependencies
         run: pnpm install --frozen-lockfile
 
+      # The workspace packages resolve one another through their compiled
+      # dist/index.d.ts, so on a clean checkout the packages have to be built
+      # before anything that imports them can typecheck.
+      - name: Build
+        run: pnpm build
+
       - name: Typecheck
         run: pnpm typecheck
 
       - name: Test
-        run: pnpm test
+        run: node --test "dist/**/*.test.js"
 
       - name: Docker build
         run: docker build -t iag-api-gateway:ci .
