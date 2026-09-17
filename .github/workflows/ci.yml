@@ -12,9 +12,11 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
+      # No `version` here: package.json's `packageManager` field pins pnpm,
+      # and pnpm/action-setup@v4 refuses to run when both are given ("Multiple
+      # versions of pnpm specified"). That refusal is why this workflow has
+      # failed on every push since the field was added.
       - uses: pnpm/action-setup@v4
-        with:
-          version: 9
 
       - uses: actions/setup-node@v4
         with:
