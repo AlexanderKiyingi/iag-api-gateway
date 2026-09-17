@@ -18,6 +18,7 @@ import { createReadyCheck } from "./ready.js";
 import { registerCacheHeaders } from "./cache.js";
 import { createRateLimitStore, rateLimitBootMessage } from "./ratelimit-store.js";
 import { registerApprovalsDesk } from "./approvals-desk.js";
+import { registerUpstreamDiagnostics } from "./upstream-diagnostics.js";
 import {
   isLoopbackUpstream,
   sortedUpstreamRoutes,
@@ -137,6 +138,7 @@ const service = await createService({
     // Registered before the proxies so the aggregated desk answers on
     // /api/v1/approvals/desk rather than being swallowed by a prefix match.
     registerApprovalsDesk(app);
+    registerUpstreamDiagnostics(app);
 
     for (const config of sortedUpstreamRoutes()) {
       // A loopback upstream in production means the UPSTREAM_* variable is unset
