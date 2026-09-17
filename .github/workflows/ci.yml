@@ -12,9 +12,11 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
+      # No `version` here: package.json's `packageManager` field pins pnpm,
+      # and pnpm/action-setup@v4 refuses to run when both are given ("Multiple
+      # versions of pnpm specified"). That refusal is why this workflow has
+      # failed on every push since the field was added.
       - uses: pnpm/action-setup@v4
-        with:
-          version: 9
 
       - uses: actions/setup-node@v4
         with:
@@ -24,11 +26,17 @@ jobs:
       - name: Install dependencies
         run: pnpm install --frozen-lockfile
 
+      # The workspace packages resolve one another through their compiled
+      # dist/index.d.ts, so on a clean checkout the packages have to be built
+      # before anything that imports them can typecheck.
+      - name: Build
+        run: pnpm build
+
       - name: Typecheck
         run: pnpm typecheck
 
       - name: Test
-        run: pnpm test
+        run: node --test "dist/**/*.test.js"
 
       - name: Docker build
         run: docker build -t iag-api-gateway:ci .
