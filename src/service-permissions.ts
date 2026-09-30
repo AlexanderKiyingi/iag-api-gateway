@@ -91,6 +91,12 @@ export const productionViewPermissions = [
   "production.view_run",
   "production.view_schedule",
   "production.view_shift",
+  // Configuration reads. iag-production gates its masters — products,
+  // machines, operators, shifts, grades, reason codes, CCP limits — on
+  // RequireAnyPermission("production.view_run", "production.view_config").
+  // Omitting view_config here refused a caller who holds it and not
+  // view_run, which is exactly the shape of a configurator role.
+  "production.view_config",
 ];
 
 export const productionMutatePermissions = [
@@ -98,6 +104,11 @@ export const productionMutatePermissions = [
   "production.change_run",
   "production.change_schedule",
   "production.change_shift",
+  // Every master write in iag-production is gated on this one codename
+  // (cfgWrite in its router). With it absent from this list no caller could
+  // write a product, machine, operator, shift, grade or reason code at all —
+  // a superadmin only got through because it also holds add_run.
+  "production.change_config",
 ];
 
 export const productionAdminWritePermissions = [
