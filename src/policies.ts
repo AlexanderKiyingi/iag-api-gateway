@@ -209,6 +209,9 @@ export const routePolicies: RoutePolicy[] = [
   // Dials every upstream and reports host, port and dial error — internal
   // topology, so admin only.
   { prefix: "/api/v1/upstreams", methods: ["GET"], requireAdmin: true },
+  // Per-user tool utilisation (who used which tool, how much, last seen) —
+  // personal activity data, so admin only.
+  { prefix: "/api/v1/usage", methods: ["GET"], requireAdmin: true },
   { prefix: "/api/v1/procurement/health", public: true },
   { prefix: "/api/v1/procurement/ready", public: true },
   { prefix: "/api/v1/procurement/healthz", public: true },
