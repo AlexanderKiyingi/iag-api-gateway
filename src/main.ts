@@ -19,6 +19,7 @@ import { registerCacheHeaders } from "./cache.js";
 import { createRateLimitStore, rateLimitBootMessage } from "./ratelimit-store.js";
 import { registerApprovalsDesk } from "./approvals-desk.js";
 import { registerUpstreamDiagnostics } from "./upstream-diagnostics.js";
+import { registerUsage } from "./usage.js";
 import {
   isLoopbackUpstream,
   sortedUpstreamRoutes,
@@ -139,6 +140,14 @@ const service = await createService({
     // /api/v1/approvals/desk rather than being swallowed by a prefix match.
     registerApprovalsDesk(app);
     registerUpstreamDiagnostics(app);
+    // Tool utilisation per user, counted from verified identities on every
+    // proxied request; shares the limiter's Redis when there is one.
+    const usage = registerUsage(app, rateLimitStore.client);
+    logger[usage.storage === "redis" || env.NODE_ENV !== "production" ? "info" : "warn"](
+      usage.storage === "redis"
+        ? "tool usage: counting into Redis"
+        : "tool usage: REDIS_URL unset — counting in memory, reset on every deploy",
+    );
 
     for (const config of sortedUpstreamRoutes()) {
       // A loopback upstream in production means the UPSTREAM_* variable is unset

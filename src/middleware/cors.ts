@@ -28,6 +28,8 @@ export async function registerCORS(
       "If-Match",
       "X-Request-ID",
       "X-Workspace-User",
+      // Names the calling tool for usage attribution (usage.ts).
+      "X-IAG-App",
     ],
     exposedHeaders: ["ETag", "X-Request-ID"],
     maxAge: 86_400,
