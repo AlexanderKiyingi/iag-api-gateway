@@ -7,6 +7,7 @@ import {
   isStaff,
   type PrincipalClaims,
 } from "@iag/auth-client";
+import { blockedTool } from "../tool-access.js";
 import { sendGatewayError } from "../errors.js";
 import { matchPolicy } from "../policies.js";
 import { isProxiedPath } from "../routes.js";
@@ -116,6 +117,19 @@ async function enforceAuthPolicy(
   // The gateway no longer injects X-IAG-* trust headers — backends verify
   // the same Authorization header against their own audience.
   request.auth = principal;
+
+  // A person blocked from the calling tool is refused before any permission
+  // check, whatever their roles grant (tool-access.ts).
+  const blocked = blockedTool(principal, request.headers["x-iag-app"]);
+  if (blocked) {
+    return sendGatewayError(
+      reply,
+      403,
+      "TOOL_ACCESS_BLOCKED",
+      "Your account is not allowed to use this tool. Ask an administrator to restore access.",
+      { reason: "tool_access_blocked", detail: blocked },
+    );
+  }
 
   // Propagate the correlation id so upstream services join the same trace.
   if (request.requestId) {
