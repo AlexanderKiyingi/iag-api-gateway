@@ -76,6 +76,9 @@ const gatewayEnvSchema = baseEnvSchema
      *  token minting). Defence-in-depth in front of the auth service's own
      *  per-endpoint limits. */
     SENSITIVE_RATE_LIMIT_MAX: z.coerce.number().int().positive().default(15),
+    // Links that work without signing in (QR pages, project shares, buyer
+    // quality links), per IP per window, counted apart from signed-in traffic.
+    PUBLIC_SHARE_RATE_LIMIT_MAX: z.coerce.number().int().positive().default(60),
     /** Max incoming request-header size (bytes). Raised above Node's ~16 KB
      *  default so large multi-aud / granular-permission JWTs (+ cookies) don't
      *  get rejected with HTTP 431 before reaching an upstream. */
