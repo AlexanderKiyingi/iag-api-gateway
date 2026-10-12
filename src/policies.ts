@@ -462,6 +462,8 @@ export const routePolicies: RoutePolicy[] = [
   { prefix: "/api/v1/traceability/ready", public: true },
   { prefix: "/api/v1/traceability/healthz", public: true },
   { prefix: "/api/v1/traceability/public", public: true },
+  // Buyer quality links (quality-control): the link is the credential.
+  { prefix: "/api/v1/quality-control/public", public: true },
   {
     prefix: "/api/v1/traceability/api/v1/lots",
     methods: ["POST"],

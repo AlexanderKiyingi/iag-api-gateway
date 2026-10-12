@@ -1,4 +1,5 @@
 import rateLimit from "@fastify/rate-limit";
+import { bucketFor, rateLimitKey } from "./ratelimit-policy.js";
 import httpProxy from "@fastify/http-proxy";
 import type { FastifyReply } from "fastify";
 import { createService } from "@iag/service-core";
@@ -64,15 +65,7 @@ const service = await createService({
     // default it is the edge IP and the limiter is effectively one global bucket.
     // The store is Redis-backed when REDIS_URL is set and in-process otherwise;
     // only the former is correct for more than one gateway instance.
-    const OAUTH_TOKEN_PATH = "/api/v1/authentication/oauth/token";
-    const SENSITIVE_AUTH_PATHS = [
-      "/api/v1/authentication/v1/auth/forgot-password",
-      "/api/v1/authentication/v1/auth/reset-password",
-      "/api/v1/authentication/oauth/revoke",
-      "/api/v1/authentication/v1/service/provision-user",
-      "/api/v1/authentication/v1/tokens",
-      "/api/v1/authentication/v1/share-tokens",
-    ];
+    // The budgets themselves live in ratelimit-policy.ts.
     // TRUST_PROXY decides whether the limiter's per-IP key is real. Both wrong
     // values fail quietly, in opposite directions, so say so at boot where the
     // deploy log makes it obvious rather than leaving it to be discovered as
@@ -106,18 +99,22 @@ const service = await createService({
     await app.register(rateLimit, {
       global: true,
       timeWindow: env.RATE_LIMIT_WINDOW_MS,
-      keyGenerator: (request) => request.ip,
+      keyGenerator: (request) => rateLimitKey(request.url, request.ip),
       redis: rateLimitStore.client,
       // A limiter that cannot reach its store must not take requests down with
       // it: count when possible, serve regardless.
       skipOnError: true,
       max: (request, _key) => {
-        const path = request.url.split("?")[0] ?? "";
-        if (path.includes(OAUTH_TOKEN_PATH)) return env.OAUTH_RATE_LIMIT_MAX;
-        if (SENSITIVE_AUTH_PATHS.some((p) => path.includes(p))) {
-          return env.SENSITIVE_RATE_LIMIT_MAX;
+        switch (bucketFor(request.url)) {
+          case "oauth":
+            return env.OAUTH_RATE_LIMIT_MAX;
+          case "sensitive":
+            return env.SENSITIVE_RATE_LIMIT_MAX;
+          case "public-share":
+            return env.PUBLIC_SHARE_RATE_LIMIT_MAX;
+          default:
+            return env.RATE_LIMIT_MAX;
         }
-        return env.RATE_LIMIT_MAX;
       },
       // Throttling is currently invisible: a user hitting the ceiling reports
       // "the app is broken sometimes" and nothing correlates it. Log it so the
