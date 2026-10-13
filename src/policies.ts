@@ -34,7 +34,27 @@ export interface RoutePolicy {
   requireAllPermissions?: string[];
   /** Allow platform `admin` group read access without explicit fleet.view_* on the JWT */
   fleetPlatformAdminRead?: boolean;
+  /**
+   * Only these frontends (X-IAG-App) may call; superusers are exempt.
+   *
+   * The header is set server-side by each frontend but a direct API client can
+   * send any value, so this keeps an action in the tools that own it — it is
+   * not an authorization boundary. Permissions still decide who may act.
+   */
+  apps?: readonly string[];
 }
+
+/**
+ * New contractors are registered only in Finance, Project Manager and Contract
+ * Manager. Every other tool reads the register (the security desk picks a
+ * standing pass's company from it) but must not be where a contractor first
+ * appears.
+ */
+export const CONTRACTOR_REGISTRATION_APPS = [
+  "iag-finance-test",
+  "iag-project-manager",
+  "iag-contract-manager",
+] as const;
 
 export const routePolicies: RoutePolicy[] = [
   { prefix: "/health", public: true },
@@ -304,6 +324,12 @@ export const routePolicies: RoutePolicy[] = [
   {
     prefix: "/api/v1/contract-management/v1/admin/monitoring",
     permissions: ["audit.read"],
+    requireAllPermissions: [PLATFORM_ACCESS.contractManagement],
+  },
+  {
+    prefix: "/api/v1/contract-management/v1/governance/contractors",
+    methods: ["POST"],
+    apps: CONTRACTOR_REGISTRATION_APPS,
     requireAllPermissions: [PLATFORM_ACCESS.contractManagement],
   },
   {

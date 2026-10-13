@@ -1,7 +1,7 @@
 import assert from "node:assert/strict";
 import { describe, it } from "node:test";
 import { isProxiedPath } from "./routes.js";
-import { matchPolicy } from "./policies.js";
+import { CONTRACTOR_REGISTRATION_APPS, matchPolicy } from "./policies.js";
 import { PLATFORM_ACCESS, erpMutatePermissions, erpViewPermissions, mesAdminWritePermissions, mesMutatePermissions, mesViewPermissions, productionAdminWritePermissions, productionMutatePermissions, productionViewPermissions, scmViewPermissions } from "./service-permissions.js";
 
 describe("gateway policies", () => {
@@ -13,6 +13,20 @@ describe("gateway policies", () => {
 
   // The reports equivalents of these two lived here until the route was
   // removed; the supply-chain pair below covers the same two policy shapes.
+  it("keeps registering a contractor to Finance, Project Manager and Contract Manager", () => {
+    const create = matchPolicy("/api/v1/contract-management/v1/governance/contractors", "POST");
+    assert.deepEqual(create?.apps, CONTRACTOR_REGISTRATION_APPS);
+    assert.deepEqual(create?.requireAllPermissions, [PLATFORM_ACCESS.contractManagement]);
+    // Reading the register, and editing an existing contractor, stay open to
+    // any tool the service permits (the security desk reads it).
+    for (const [path, method] of [
+      ["/api/v1/contract-management/v1/governance/contractors", "GET"],
+      ["/api/v1/contract-management/v1/governance/contractors/c1", "PATCH"],
+    ] as const) {
+      assert.equal(matchPolicy(path, method)?.apps, undefined, `${method} ${path}`);
+    }
+  });
+
   it("matches public supply-chain QR", () => {
     const policy = matchPolicy("/api/v1/supply-chain/public/q/demo", "GET");
     assert.equal(policy?.public, true);

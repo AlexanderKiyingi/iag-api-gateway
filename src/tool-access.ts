@@ -19,6 +19,24 @@ export function toolBlockGroup(app: string): string {
   return TOOL_BLOCK_PREFIX + app.replace(/^iag-/, "");
 }
 
+/**
+ * Whether the calling tool may use a route restricted to `apps` (RoutePolicy.apps).
+ *
+ * Unlike a block, a restricted route refuses a request with no header: the
+ * point is that the action only happens from the named tools. Superusers stay
+ * exempt, for the same reason as above and so an admin can still repair data
+ * with a direct client.
+ */
+export function appAllowed(
+  principal: PrincipalClaims,
+  header: unknown,
+  apps: readonly string[],
+): boolean {
+  if (principal.is_superuser) return true;
+  const app = normalizeApp(header);
+  return Boolean(app && apps.includes(app));
+}
+
 /** The blocked app's name when this principal may not use the calling tool, else null. */
 export function blockedTool(principal: PrincipalClaims, header: unknown): string | null {
   const app = normalizeApp(header);
