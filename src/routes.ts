@@ -162,6 +162,18 @@ export const upstreamRoutes: Record<string, UpstreamRoute> = {
     prefix: "/api/v1/traceag-portal",
     rewritePrefix: "/",
   },
+  /** Farmer services — farmer engagement registers (marketplace, notices,
+   *  surveys, rewards, support tickets, disputes, farm-gate prices, SMS
+   *  blasts) plus loans, insurance and housing, all under /v1. Its user-token
+   *  audience is iag.farmer-services. On Railway set UPSTREAM_FARMER_SERVICES
+   *  to the private domain and real port, e.g.
+   *  http://${{iag-farmer-services.RAILWAY_PRIVATE_DOMAIN}}:${{iag-farmer-services.PORT}}. */
+  "/api/v1/farmer-services": {
+    envKey: "UPSTREAM_FARMER_SERVICES",
+    upstream: upstream("UPSTREAM_FARMER_SERVICES", "http://127.0.0.1:4021"),
+    prefix: "/api/v1/farmer-services",
+    rewritePrefix: "/",
+  },
   "/api/v1/warehouse": {
     envKey: "UPSTREAM_WAREHOUSE",
     upstream: upstream("UPSTREAM_WAREHOUSE", "http://127.0.0.1:4005"),
