@@ -68,7 +68,15 @@ const gatewayEnvSchema = baseEnvSchema
       .enum(["true", "false"])
       .default("false")
       .transform((v) => v === "true"),
-    RATE_LIMIT_MAX: z.coerce.number().int().positive().default(300),
+    /**
+     * Per-IP ceiling, checked before the token is verified — flood protection,
+     * not a fair share. It used to be the only limit (300), which every user
+     * of a server-side frontend shared: one busy guard on the security desk
+     * spent it and everyone else's saves sat retrying 429s.
+     */
+    RATE_LIMIT_MAX: z.coerce.number().int().positive().default(3000),
+    /** Per signed-in user (or service client) per window, after verification. */
+    USER_RATE_LIMIT_MAX: z.coerce.number().int().positive().default(600),
     RATE_LIMIT_WINDOW_MS: z.coerce.number().int().positive().default(60_000),
     OAUTH_RATE_LIMIT_MAX: z.coerce.number().int().positive().default(30),
     /** Tighter per-window cap for abuse-prone unauthenticated auth endpoints

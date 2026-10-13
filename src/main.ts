@@ -1,5 +1,5 @@
 import rateLimit from "@fastify/rate-limit";
-import { bucketFor, rateLimitKey } from "./ratelimit-policy.js";
+import { bucketFor, principalRateLimitKey, rateLimitKey } from "./ratelimit-policy.js";
 import httpProxy from "@fastify/http-proxy";
 import type { FastifyReply } from "fastify";
 import { createService } from "@iag/service-core";
@@ -127,11 +127,22 @@ const service = await createService({
       },
     });
 
-    registerAuthMiddleware(app, {
-      jwksUrl: env.JWKS_URL,
-      issuer: env.JWT_ISSUER,
-      audience: env.JWT_AUDIENCE,
+    // The per-user budget, checked inside the auth hook once the token is
+    // verified. Same store as the per-IP limiter, so replicas share it too.
+    const principalLimiter = app.createRateLimit({
+      max: env.USER_RATE_LIMIT_MAX,
+      timeWindow: env.RATE_LIMIT_WINDOW_MS,
+      keyGenerator: (request) => (request.auth ? principalRateLimitKey(request.auth) : `ip:${request.ip}`),
     });
+    registerAuthMiddleware(
+      app,
+      {
+        jwksUrl: env.JWKS_URL,
+        issuer: env.JWT_ISSUER,
+        audience: env.JWT_AUDIENCE,
+      },
+      principalLimiter,
+    );
 
     // Registered before the proxies so the aggregated desk answers on
     // /api/v1/approvals/desk rather than being swallowed by a prefix match.
