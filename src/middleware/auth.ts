@@ -7,7 +7,7 @@ import {
   isStaff,
   type PrincipalClaims,
 } from "@iag/auth-client";
-import { blockedTool } from "../tool-access.js";
+import { appAllowed, blockedTool } from "../tool-access.js";
 import { sendGatewayError } from "../errors.js";
 import { matchPolicy } from "../policies.js";
 import { isProxiedPath } from "../routes.js";
@@ -128,6 +128,18 @@ async function enforceAuthPolicy(
       "TOOL_ACCESS_BLOCKED",
       "Your account is not allowed to use this tool. Ask an administrator to restore access.",
       { reason: "tool_access_blocked", detail: blocked },
+    );
+  }
+
+  // A route kept to named tools (e.g. registering a contractor) is refused
+  // from any other tool before the permission checks.
+  if (policy.apps?.length && !appAllowed(principal, request.headers["x-iag-app"], policy.apps)) {
+    return sendGatewayError(
+      reply,
+      403,
+      "TOOL_NOT_ALLOWED",
+      "This action is only available in another IAG tool.",
+      { reason: "tool_not_allowed", detail: policy.apps.join(", ") },
     );
   }
 

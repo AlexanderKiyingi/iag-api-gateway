@@ -1,6 +1,6 @@
 import assert from "node:assert/strict";
 import { test } from "node:test";
-import { blockedTool, toolBlockGroup } from "./tool-access.js";
+import { appAllowed, blockedTool, toolBlockGroup } from "./tool-access.js";
 
 test("toolBlockGroup maps an app to its block group", () => {
   assert.equal(toolBlockGroup("iag-fleet"), "no-access-fleet");
@@ -21,4 +21,15 @@ test("superusers are never blocked, and untagged requests are not tool traffic",
   assert.equal(blockedTool({ sub: "s", is_superuser: true, groups: ["no-access-fleet"] }, "iag-fleet"), null);
   assert.equal(blockedTool({ sub: "u1", groups: ["no-access-fleet"] }, undefined), null);
   assert.equal(blockedTool({ sub: "u1", groups: ["no-access-fleet"] }, "not a valid name!"), null);
+});
+
+test("a restricted route admits only the named tools", () => {
+  const apps = ["iag-finance-test", "iag-project-manager", "iag-contract-manager"];
+  const p = { sub: "u1", groups: ["user"] };
+  assert.equal(appAllowed(p, "iag-project-manager", apps), true);
+  assert.equal(appAllowed(p, "IAG-Contract-Manager", apps), true);
+  assert.equal(appAllowed(p, "iag-security", apps), false);
+  // No header is refused, unlike a block: the action belongs to those tools.
+  assert.equal(appAllowed(p, undefined, apps), false);
+  assert.equal(appAllowed({ sub: "s", is_superuser: true }, undefined, apps), true);
 });
