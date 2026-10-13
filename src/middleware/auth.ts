@@ -21,9 +21,27 @@ export interface GatewayAuthConfig {
   audience: string | string[];
 }
 
+/**
+ * A limiter from @fastify/rate-limit's createRateLimit (shares its store).
+ * `isAllowed: true` only means the key is allow-listed; a counted request
+ * comes back `isAllowed: false` and is over budget when `isExceeded`.
+ */
+export type PrincipalLimiter = (request: FastifyRequest) => Promise<
+  | { isAllowed: true; key: string }
+  | {
+      isAllowed: false;
+      key: string;
+      max: number;
+      remaining: number;
+      ttlInSeconds: number;
+      isExceeded: boolean;
+    }
+>;
+
 export function registerAuthMiddleware(
   app: FastifyInstance,
   config: GatewayAuthConfig,
+  principalLimiter?: PrincipalLimiter,
 ) {
   const auth = createAuthClient({
     jwksUrl: config.jwksUrl,
@@ -35,7 +53,7 @@ export function registerAuthMiddleware(
     "onRequest",
     async (request: FastifyRequest, reply: FastifyReply) => {
       try {
-        await enforceAuthPolicy(request, reply, auth);
+        await enforceAuthPolicy(request, reply, auth, principalLimiter);
       } catch (err) {
         request.log.error({ err }, "auth middleware failed");
         sendGatewayError(
@@ -53,6 +71,7 @@ async function enforceAuthPolicy(
   request: FastifyRequest,
   reply: FastifyReply,
   auth: ReturnType<typeof createAuthClient>,
+  principalLimiter?: PrincipalLimiter,
 ) {
   const path = request.url.split("?")[0] ?? request.url;
   const policy = matchPolicy(path, request.method);
@@ -120,6 +139,25 @@ async function enforceAuthPolicy(
 
   // A person blocked from the calling tool is refused before any permission
   // check, whatever their roles grant (tool-access.ts).
+  // Each signed-in person (or service client) draws on a budget of their own,
+  // so one busy user behind a shared server address cannot starve the rest.
+  if (principalLimiter) {
+    const limit = await principalLimiter(request);
+    if (!limit.isAllowed && limit.isExceeded) {
+      reply.header("retry-after", String(limit.ttlInSeconds));
+      reply.header("x-ratelimit-limit", String(limit.max));
+      reply.header("x-ratelimit-remaining", "0");
+      request.log.warn({ key: limit.key, url: request.url }, "per-user rate limit exceeded");
+      return sendGatewayError(
+        reply,
+        429,
+        "TOO_MANY_REQUESTS",
+        `Too many requests from this account; try again in ${limit.ttlInSeconds}s.`,
+        { reason: "user_rate_limited" },
+      );
+    }
+  }
+
   const blocked = blockedTool(principal, request.headers["x-iag-app"]);
   if (blocked) {
     return sendGatewayError(
