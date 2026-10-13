@@ -34,6 +34,7 @@ services:
       UPSTREAM_TRACEAG_PORTAL: ${UPSTREAM_TRACEAG_PORTAL:-http://host.docker.internal:4020}
       UPSTREAM_MES: ${UPSTREAM_MES:-http://host.docker.internal:4003}
       UPSTREAM_QUALITY_CONTROL: ${UPSTREAM_QUALITY_CONTROL:-http://host.docker.internal:4004}
+      UPSTREAM_SECURITY: ${UPSTREAM_SECURITY:-http://host.docker.internal:4012}
     extra_hosts:
       - "host.docker.internal:host-gateway"
     expose:
