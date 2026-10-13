@@ -24,6 +24,7 @@ export const PLATFORM_ACCESS = {
   production: "platform.access_production",
   qualityControl: "platform.access_quality_control",
   warehouse: "platform.access_warehouse",
+  security: "platform.access_security",
 } as const;
 
 export const warehouseViewPermissions = [

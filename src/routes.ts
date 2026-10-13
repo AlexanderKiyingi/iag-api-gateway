@@ -204,6 +204,13 @@ export const upstreamRoutes: Record<string, UpstreamRoute> = {
     prefix: "/api/v1/quality-control",
     rewritePrefix: "/",
   },
+  /** iag-site-security — security desk records (gate events, visitors, …). */
+  "/api/v1/security": {
+    envKey: "UPSTREAM_SECURITY",
+    upstream: upstream("UPSTREAM_SECURITY", "http://127.0.0.1:4012"),
+    prefix: "/api/v1/security",
+    rewritePrefix: "/",
+  },
 };
 
 /** Routes whose upstream is unset in production and will fail on every request. */

@@ -177,6 +177,28 @@ describe("gateway policies", () => {
   });
 });
 
+describe("site security upstream", () => {
+  it("is proxied", () => {
+    assert.equal(isProxiedPath("/api/v1/security/api/v1/gate-events"), true);
+  });
+
+  it("gates reads and writes on platform.access_security only", () => {
+    for (const method of ["GET", "POST", "PATCH", "DELETE"]) {
+      const policy = matchPolicy("/api/v1/security/api/v1/gate-events", method);
+      assert.ok(policy, `${method} must have a policy`);
+      assert.deepEqual(policy?.requireAllPermissions, [PLATFORM_ACCESS.security]);
+      assert.equal(PLATFORM_ACCESS.security, "platform.access_security");
+      assert.equal(policy?.permissions, undefined, "fine-grained security.* RBAC lives in the service");
+      assert.notEqual(policy?.public, true);
+    }
+  });
+
+  it("leaves health and ready public", () => {
+    assert.equal(matchPolicy("/api/v1/security/health", "GET")?.public, true);
+    assert.equal(matchPolicy("/api/v1/security/ready", "GET")?.public, true);
+  });
+});
+
 describe("aggregated approval desk", () => {
   it("is authenticated by the gateway, not left to the upstreams", () => {
     const policy = matchPolicy("/api/v1/approvals/desk", "GET");

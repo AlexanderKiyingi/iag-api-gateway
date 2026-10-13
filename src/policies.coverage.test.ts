@@ -124,6 +124,11 @@ const SAMPLE_PATHS: Record<string, string[]> = {
     "/api/v1/warehouse/api/v1/items",
     "/api/v1/warehouse/api/v1/admin/audit-logs",
   ],
+  "/api/v1/security": [
+    "/api/v1/security/health",
+    "/api/v1/security/ready",
+    "/api/v1/security/api/v1/gate-events",
+  ],
   "/api/v1/quality-control": [
     "/api/v1/quality-control/health",
     "/api/v1/quality-control/api/v1/samples",

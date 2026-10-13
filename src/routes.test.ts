@@ -93,6 +93,11 @@ const REWRITE_CASES: Array<{
     upstreamKey: "/api/v1/dms",
   },
   {
+    gatewayPath: "/api/v1/security/api/v1/gate-events",
+    upstreamPath: "/api/v1/gate-events",
+    upstreamKey: "/api/v1/security",
+  },
+  {
     gatewayPath: "/api/v1/dms/assets/logo.png",
     upstreamPath: "/assets/logo.png",
     upstreamKey: "/api/v1/dms",
@@ -116,6 +121,17 @@ describe("gateway upstream routing", () => {
         upstreamPath,
         gatewayPath,
       );
+    }
+  });
+
+  it("registers iag-site-security on UPSTREAM_SECURITY", () => {
+    const route = upstreamRoutes["/api/v1/security"];
+    assert.ok(route, "missing /api/v1/security upstream");
+    assert.equal(route.prefix, "/api/v1/security");
+    assert.equal(route.envKey, "UPSTREAM_SECURITY");
+    assert.equal(route.rewritePrefix, "/");
+    if (!process.env.UPSTREAM_SECURITY) {
+      assert.equal(route.upstream, "http://127.0.0.1:4012");
     }
   });
 

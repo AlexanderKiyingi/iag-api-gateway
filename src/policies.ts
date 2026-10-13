@@ -623,6 +623,13 @@ export const routePolicies: RoutePolicy[] = [
     prefix: "/api/v1/warehouse/api/v1",
     requireAllPermissions: [PLATFORM_ACCESS.warehouse],
   },
+  /** iag-site-security: platform gate only — the service enforces security.* RBAC. */
+  { prefix: "/api/v1/security/health", public: true },
+  { prefix: "/api/v1/security/ready", public: true },
+  {
+    prefix: "/api/v1/security/api/v1",
+    requireAllPermissions: [PLATFORM_ACCESS.security],
+  },
   { prefix: "/api/v1/quality-control/health", public: true },
   { prefix: "/api/v1/quality-control/ready", public: true },
   {
