@@ -13,6 +13,7 @@ export const PLATFORM_ACCESS = {
   procurement: "platform.access_procurement",
   supplyChain: "platform.access_supply_chain",
   traceability: "platform.access_traceability",
+  farmerServices: "platform.access_farmer_services",
   projectManagement: "platform.access_project_management",
   contractManagement: "platform.access_contract_management",
   crm: "platform.access_crm",
@@ -298,6 +299,10 @@ export const scmViewPermissions = [
   "traceability.view_batch",
   "traceability.view_chain",
   "traceability.view_events",
+  // Harvest lots and field collections (SCM /api/v1/harvest-lots,
+  // /api/v1/collections). Plots ride on scm.view_supplier.
+  "traceability.view_harvestlot",
+  "traceability.view_collection",
   "scm.view_supplier",
   "scm.view_own_supplier",
   "scm.view_own_batch",
@@ -321,6 +326,14 @@ export const scmMutatePermissions = [
   "traceability.change_batch",
   "traceability.add_trace_event",
   "traceability.publish_qr",
+  // Harvest lots (create, update, split into batches, delete) and field
+  // collections (create, update, receive, pay, void). Plots ride on
+  // scm.change_supplier.
+  "traceability.add_harvestlot",
+  "traceability.change_harvestlot",
+  "traceability.delete_harvestlot",
+  "traceability.add_collection",
+  "traceability.change_collection",
   "scm.add_supplier",
   "scm.change_supplier",
   "scm.add_purchaseorder",

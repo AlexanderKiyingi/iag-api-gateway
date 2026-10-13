@@ -54,6 +54,7 @@ See [`.env.example`](.env.example) (canonical) and [`config/.env.production.exam
 | `RATE_LIMIT_MAX` / `OAUTH_RATE_LIMIT_MAX` | Per-IP limits at the gateway |
 | `CORS_ALLOWED_ORIGINS` | Comma-separated browser origins (canonical; legacy aliases supported) |
 | `UPSTREAM_*` | Service base URLs |
+| `UPSTREAM_FARMER_SERVICES` | farmer-services (`/api/v1/farmer-services` → `/`, default `http://127.0.0.1:4021`). **Set it on Railway before deploying the route**, e.g. `http://${{iag-farmer-services.RAILWAY_PRIVATE_DOMAIN}}:${{iag-farmer-services.PORT}}`; unset, the route falls back to loopback and 503s. Callers need `platform.access_farmer_services` (seeded by iag-authentication), and user tokens must carry the `iag.farmer-services` audience. |
 
 ## Scripts
 

@@ -529,6 +529,17 @@ export const routePolicies: RoutePolicy[] = [
   // carries every audience) and enforces access downstream in payments /
   // farmer-services. The gateway only requires an authenticated caller.
   { prefix: "/api/v1/traceag-portal/api", authenticated: true },
+  // Farmer services. Probes are public; everything under /v1 needs the
+  // platform.access_farmer_services gate, reads and writes alike. The service
+  // enforces the fine-grained farmer_services.* codenames itself (no any-of
+  // pre-filter here, so a codename the service adds is never stranded at the
+  // gateway).
+  { prefix: "/api/v1/farmer-services/health", public: true },
+  { prefix: "/api/v1/farmer-services/ready", public: true },
+  {
+    prefix: "/api/v1/farmer-services/v1",
+    requireAllPermissions: [PLATFORM_ACCESS.farmerServices],
+  },
   { prefix: "/api/v1/mes/health", public: true },
   { prefix: "/api/v1/mes/ready", public: true },
   {

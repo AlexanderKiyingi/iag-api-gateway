@@ -89,6 +89,13 @@ const SAMPLE_PATHS: Record<string, string[]> = {
     "/api/v1/traceag-portal/api/batches",
     "/api/v1/traceag-portal/api/insurance/policies",
   ],
+  "/api/v1/farmer-services": [
+    "/api/v1/farmer-services/health",
+    "/api/v1/farmer-services/ready",
+    "/api/v1/farmer-services/v1/notices",
+    "/api/v1/farmer-services/v1/farmgate-prices",
+    "/api/v1/farmer-services/v1/loans",
+  ],
   "/api/v1/mes": [
     "/api/v1/mes/health",
     "/api/v1/mes/api/v1/bootstrap",
