@@ -17,8 +17,14 @@ import { upstreamRoutes } from "./routes.js";
  * and the four-eyes rule, stays with the service that owns the request.
  */
 
-/** Prefixes that expose GET <prefix>/v1/approvals/desk. */
-const DESK_SOURCES = ["/api/v1/procurement"] as const;
+/**
+ * Upstreams that expose a desk, and the path each serves it at. The path is the
+ * service's own route, after the gateway prefix is stripped: procurement
+ * mounts its API under /api/v1, so its desk is /api/v1/approvals/desk.
+ */
+const DESK_SOURCES: ReadonlyArray<{ prefix: string; path: string }> = [
+  { prefix: "/api/v1/procurement", path: "/api/v1/approvals/desk" },
+];
 
 /** A slow or dead upstream must not hold the whole queue hostage. */
 const FANOUT_TIMEOUT_MS = Number(process.env.APPROVALS_DESK_TIMEOUT_MS ?? 4000);
@@ -36,7 +42,7 @@ interface SourceResult {
   error?: string;
 }
 
-async function fetchDesk(prefix: string, authorization: string): Promise<SourceResult> {
+async function fetchDesk(prefix: string, path: string, authorization: string): Promise<SourceResult> {
   const route = upstreamRoutes[prefix];
   const source = prefix.replace("/api/v1/", "");
   if (!route) {
@@ -48,7 +54,7 @@ async function fetchDesk(prefix: string, authorization: string): Promise<SourceR
   try {
     const base = route.upstream.replace(/\/$/, "");
     const rewrite = route.rewritePrefix === "/" ? "" : route.rewritePrefix;
-    const res = await fetch(`${base}${rewrite}/v1/approvals/desk`, {
+    const res = await fetch(`${base}${rewrite}${path}`, {
       headers: { authorization, accept: "application/json" },
       signal: controller.signal,
     });
@@ -81,7 +87,7 @@ export function registerApprovalsDesk(app: FastifyInstance): void {
       }
 
       const results = await Promise.all(
-        DESK_SOURCES.map((prefix) => fetchDesk(prefix, authorization)),
+        DESK_SOURCES.map(({ prefix, path }) => fetchDesk(prefix, path, authorization)),
       );
 
       const items = results.flatMap((r) => r.items);
