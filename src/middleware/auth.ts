@@ -49,6 +49,21 @@ export function registerAuthMiddleware(
   );
 }
 
+/**
+ * Whether a request may carry its access token as ?token=: a WebSocket upgrade
+ * (the Upgrade header is the authoritative signal) or an EventSource stream
+ * (a GET that accepts text/event-stream). Neither can set an Authorization
+ * header from a browser. Every other request must use the header, so a token
+ * pasted into an ordinary URL is not honoured.
+ */
+export function acceptsQueryToken(
+  method: string,
+  headers: { upgrade?: string; accept?: string },
+): boolean {
+  if (headers.upgrade?.toLowerCase() === "websocket") return true;
+  return method === "GET" && (headers.accept ?? "").toLowerCase().includes("text/event-stream");
+}
+
 async function enforceAuthPolicy(
   request: FastifyRequest,
   reply: FastifyReply,
@@ -78,13 +93,14 @@ async function enforceAuthPolicy(
   const header = request.headers.authorization;
   if (header?.startsWith("Bearer ")) {
     token = header.slice("Bearer ".length);
-  } else if (request.headers.upgrade?.toLowerCase() === "websocket") {
-    // Browsers cannot set an Authorization header on a WebSocket, so clients
-    // pass the access token as ?token=. Lift it to a Bearer header for the
-    // upstream. The Upgrade: websocket header is the authoritative signal, so
-    // this applies to every service exposing a WS upgrade endpoint
-    // (project-management /v1/ws/workspace, contract-management, the
-    // notifications in-app socket at /v1/realtime/ws, …).
+  } else if (acceptsQueryToken(request.method, request.headers)) {
+    // Browsers cannot set an Authorization header on a WebSocket or an
+    // EventSource, so clients pass the access token as ?token=. Lift it to a
+    // Bearer header for the upstream. This applies to every service exposing
+    // a WS upgrade endpoint (project-management /v1/ws/workspace,
+    // contract-management, the notifications in-app socket at
+    // /v1/realtime/ws, …) and to SSE streams (notifications
+    // /v1/realtime/stream).
     const q = request.url.includes("?") ? request.url.split("?")[1] : "";
     const fromQuery = new URLSearchParams(q).get("token");
     if (fromQuery) {
