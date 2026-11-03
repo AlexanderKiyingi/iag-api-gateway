@@ -16,6 +16,7 @@ import { registerRequestId } from "./middleware/request-id.js";
 import { registerSecurityHeaders } from "./middleware/security-headers.js";
 import { registerStripTrustHeaders } from "./middleware/strip-headers.js";
 import { createReadyCheck } from "./ready.js";
+import { forwardResolvedClientIP } from "./forwarded.js";
 import { registerCacheHeaders } from "./cache.js";
 import { createRateLimitStore, rateLimitBootMessage } from "./ratelimit-store.js";
 import { registerApprovalsDesk } from "./approvals-desk.js";
@@ -174,6 +175,7 @@ const service = await createService({
         // contract-management workspace socket at /v1/ws/workspace).
         websocket: config.websocket ?? false,
         replyOptions: {
+          rewriteRequestHeaders: forwardResolvedClientIP,
           onError: createProxyOnError(config.prefix, {
             exposeDetail: exposeErrorDetail,
           }),
