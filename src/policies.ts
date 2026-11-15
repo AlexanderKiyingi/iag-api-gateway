@@ -567,6 +567,11 @@ export const routePolicies: RoutePolicy[] = [
   { prefix: "/api/v1/production/health", public: true },
   { prefix: "/api/v1/production/ready", public: true },
   {
+    prefix: "/api/v1/production/api/iot/readings",
+    methods: ["POST"],
+    public: true,
+  },
+  {
     prefix: "/api/v1/production/api/v1/admin",
     methods: ["POST", "PUT", "PATCH", "DELETE"],
     permissions: productionAdminWritePermissions,

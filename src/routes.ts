@@ -192,6 +192,13 @@ export const upstreamRoutes: Record<string, UpstreamRoute> = {
     prefix: "/api/v1/erp",
     rewritePrefix: "/",
   },
+  /** Device HTTP ingest (machine-telemetry) — must register before /api/v1/production. */
+  "/api/v1/production/api/iot/readings": {
+    envKey: "UPSTREAM_MACHINE_TELEMETRY_INGEST",
+    upstream: upstream("UPSTREAM_MACHINE_TELEMETRY_INGEST", "http://127.0.0.1:4090"),
+    prefix: "/api/v1/production/api/iot/readings",
+    rewritePrefix: "/api/iot/readings",
+  },
   "/api/v1/production": {
     envKey: "UPSTREAM_PRODUCTION",
     upstream: upstream("UPSTREAM_PRODUCTION", "http://127.0.0.1:4002"),

@@ -25,6 +25,7 @@ services:
       UPSTREAM_SUPPLY_CHAIN: ${UPSTREAM_SUPPLY_CHAIN:-http://host.docker.internal:4007}
       UPSTREAM_FLEET: ${UPSTREAM_FLEET:-http://host.docker.internal:4008}
       UPSTREAM_FLEET_IOT_INGEST: ${UPSTREAM_FLEET_IOT_INGEST:-http://host.docker.internal:4080}
+      UPSTREAM_MACHINE_TELEMETRY_INGEST: ${UPSTREAM_MACHINE_TELEMETRY_INGEST:-http://host.docker.internal:4090}
       UPSTREAM_PROJECT_MANAGEMENT: ${UPSTREAM_PROJECT_MANAGEMENT:-http://host.docker.internal:4102}
       UPSTREAM_PROCUREMENT: ${UPSTREAM_PROCUREMENT:-http://host.docker.internal:4009}
       UPSTREAM_CONTRACT_MANAGEMENT: ${UPSTREAM_CONTRACT_MANAGEMENT:-http://host.docker.internal:4103}
