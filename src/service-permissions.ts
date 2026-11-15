@@ -72,6 +72,10 @@ export const mesViewPermissions = [
   "mes.view_telemetry",
   "mes.view_ai",
   "mes.view_energy",
+  // Device registry GET (list/ingestion guide) is gated on manage_iot_device
+  // in MES; without it here a principal who only holds that grant is 403'd
+  // at the gateway before MES can authorize them (same pattern as fleet).
+  "mes.manage_iot_device",
 ];
 
 export const mesMutatePermissions = [
@@ -85,6 +89,7 @@ export const mesMutatePermissions = [
   "mes.ack_alert",
   "mes.change_ai",
   "mes.add_energy",
+  "mes.manage_iot_device",
 ];
 
 export const productionViewPermissions = [
