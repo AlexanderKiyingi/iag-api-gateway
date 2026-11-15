@@ -36,7 +36,7 @@ const SAMPLE_PATHS: Record<string, string[]> = {
   ],
   "/api/v1/fleet/api/iot/pings": ["/api/v1/fleet/api/iot/pings"],
   "/api/v1/fleet": ["/api/v1/fleet/api/vehicles", "/api/v1/fleet/api/admin/audit-logs"],
-  "/api/v1/production/api/iot/readings": ["/api/v1/production/api/iot/readings"],
+  "/api/v1/mes/api/iot/readings": ["/api/v1/mes/api/iot/readings"],
   "/api/v1/project-management": [
     "/api/v1/project-management/api/v1/projects",
   ],
@@ -146,7 +146,7 @@ describe("policy coverage", () => {
     const methods: Record<string, string> = {
       "/api/v1/notifications/v1/dispatch": "POST",
       "/api/v1/fleet/api/iot/pings": "POST",
-      "/api/v1/production/api/iot/readings": "POST",
+      "/api/v1/mes/api/iot/readings": "POST",
     };
     for (const [prefix, paths] of Object.entries(SAMPLE_PATHS)) {
       for (const path of paths) {

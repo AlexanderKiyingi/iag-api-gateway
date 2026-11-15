@@ -543,6 +543,12 @@ export const routePolicies: RoutePolicy[] = [
   { prefix: "/api/v1/mes/health", public: true },
   { prefix: "/api/v1/mes/ready", public: true },
   {
+    // Device-key ingest for production machines — MES owns IoT for CMMS + production.
+    prefix: "/api/v1/mes/api/iot/readings",
+    methods: ["POST"],
+    public: true,
+  },
+  {
     prefix: "/api/v1/mes/api/v1/admin",
     methods: ["POST", "PUT", "PATCH", "DELETE"],
     permissions: mesAdminWritePermissions,
@@ -566,11 +572,6 @@ export const routePolicies: RoutePolicy[] = [
   },
   { prefix: "/api/v1/production/health", public: true },
   { prefix: "/api/v1/production/ready", public: true },
-  {
-    prefix: "/api/v1/production/api/iot/readings",
-    methods: ["POST"],
-    public: true,
-  },
   {
     prefix: "/api/v1/production/api/v1/admin",
     methods: ["POST", "PUT", "PATCH", "DELETE"],

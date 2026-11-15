@@ -180,6 +180,18 @@ export const upstreamRoutes: Record<string, UpstreamRoute> = {
     prefix: "/api/v1/warehouse",
     rewritePrefix: "/",
   },
+  /**
+   * Machine IoT HTTP ingest (edge/machine-telemetry) — MES owns production-machine
+   * IoT for both the CMMS and production apps, so the public path sits under
+   * /api/v1/mes (same pattern as fleet ingest under /api/v1/fleet). Must register
+   * before the /api/v1/mes catch-all.
+   */
+  "/api/v1/mes/api/iot/readings": {
+    envKey: "UPSTREAM_MACHINE_TELEMETRY_INGEST",
+    upstream: upstream("UPSTREAM_MACHINE_TELEMETRY_INGEST", "http://127.0.0.1:4090"),
+    prefix: "/api/v1/mes/api/iot/readings",
+    rewritePrefix: "/api/iot/readings",
+  },
   "/api/v1/mes": {
     envKey: "UPSTREAM_MES",
     upstream: upstream("UPSTREAM_MES", "http://127.0.0.1:4003"),
@@ -191,13 +203,6 @@ export const upstreamRoutes: Record<string, UpstreamRoute> = {
     upstream: upstream("UPSTREAM_ERP", "http://127.0.0.1:4001"),
     prefix: "/api/v1/erp",
     rewritePrefix: "/",
-  },
-  /** Device HTTP ingest (machine-telemetry) — must register before /api/v1/production. */
-  "/api/v1/production/api/iot/readings": {
-    envKey: "UPSTREAM_MACHINE_TELEMETRY_INGEST",
-    upstream: upstream("UPSTREAM_MACHINE_TELEMETRY_INGEST", "http://127.0.0.1:4090"),
-    prefix: "/api/v1/production/api/iot/readings",
-    rewritePrefix: "/api/iot/readings",
   },
   "/api/v1/production": {
     envKey: "UPSTREAM_PRODUCTION",
